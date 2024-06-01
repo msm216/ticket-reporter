@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+Index
+{% endblock %}
+
+
+{% block content %}
+{% block page_content %}
+
+<div class="page-header">
+    <h1>Hello, {% if name %}{{ name }}{% else %}Stranger{% endif %}!</h1>
+    <p>Your browser is {{ user_agent }}.</p>
+</div>
+<div class="page-content"></div>
+
+{% endblock %}
+{% endblock %}
+
+<!-- Bootstrap 所需的文件在styles 和scripts 块中声明，如果要在衍生模板中添加新的JavaScript 文件则需要使用继承 -->
+{% block scripts %}
+{{ super() }}
+{% endblock %}

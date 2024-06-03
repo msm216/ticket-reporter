@@ -1,9 +1,9 @@
 import os
 
 from flask import render_template, request, jsonify, redirect, url_for
-from . import create_app, db
-from .models import Task, Ticket, Project
-from .forms import TaskForm, TicketForm, ProjectForm
+from app import create_app, db
+from app.models import Task, Ticket, Project
+from app.forms import TaskForm, TicketForm, ProjectForm
 
 
 

@@ -1,6 +1,8 @@
 import random
 import string
 
+from flask import current_app
+
 from app import create_app, db
 from app.models import Task, Ticket, Project
 from datetime import datetime, timezone, timedelta
@@ -17,6 +19,7 @@ def generate_random_string(length):
         random.choice(characters) for i in range(length))
     return random_string
 
+# 生成一定矩形范围内随机经纬度
 def generate_random_coordinates():
     # 欧洲大陆大致范围的经纬度
     min_latitude = 35.0   # 南部边界：约为地中海区域
@@ -30,8 +33,14 @@ def generate_random_coordinates():
     return latitude, longitude
 
 
-with app.app_context():
+with app.app_context() as app_ctx:
     
+    # 手动创建应用上下文，确保正常使用 Flask 应用的全局变量和扩展
+    app_ctx.push()
+    print(f"Current app: {current_app.name}")
+    
+
+    # 重置数据库
     db.drop_all()
     db.create_all()
 
@@ -90,3 +99,6 @@ with app.app_context():
         ticket.update_update_on()
         db.session.add(ticket)
     db.session.commit()
+
+    # 销毁当前的应用上下文
+    app_ctx.pop()

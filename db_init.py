@@ -1,5 +1,5 @@
+import os
 import random
-import string
 
 from flask import current_app
 
@@ -7,30 +7,10 @@ from app import create_app, db
 from app.models import Task, Ticket, Project
 from datetime import datetime, timezone, timedelta
 
+from app.utilities import date_to_id, generate_random_coordinates, generate_random_string, generate_random_date
+
 
 app = create_app()
-
-
-# 生成特定长度随机字符串
-def generate_random_string(length):
-    # string.punctuation 特殊字符
-    characters = string.ascii_letters + string.digits
-    random_string = ''.join(
-        random.choice(characters) for i in range(length))
-    return random_string
-
-# 生成一定矩形范围内随机经纬度
-def generate_random_coordinates():
-    # 欧洲大陆大致范围的经纬度
-    min_latitude = 35.0   # 南部边界：约为地中海区域
-    max_latitude = 71.0   # 北部边界：约为北极圈附近
-    min_longitude = -10.0  # 西部边界：约为葡萄牙
-    max_longitude = 40.0   # 东部边界：约为乌拉尔山脉
-    # 生成随机的纬度和经度
-    latitude = random.uniform(min_latitude, max_latitude)
-    longitude = random.uniform(min_longitude, max_longitude)
-
-    return latitude, longitude
 
 
 with app.app_context() as app_ctx:
@@ -102,3 +82,22 @@ with app.app_context() as app_ctx:
 
     # 销毁当前的应用上下文
     app_ctx.pop()
+
+
+
+
+
+if __name__ == '__main__':
+
+    app = create_app()
+
+    with app.app_context():
+
+        # 关闭当前会话
+        db.session.remove()
+
+
+
+        # 销毁当前的应用上下文
+        app_ctx.pop()
+    

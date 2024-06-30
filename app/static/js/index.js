@@ -1,20 +1,3 @@
-/*
-function loadContent(page) {
-    fetch('/' + page)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('content').innerHTML = data;
-        })
-        .catch(error => console.error('Error loading content:', error));
-}
-
-function switchNav(navId) {
-    var navs = document.querySelectorAll('.nav');
-    navs.forEach(nav => nav.style.display = 'none');
-    document.getElementById(navId).style.display = 'block';
-}
-*/
-
 // 生成对应的初始化函数名称。例如：如果 page 是 'about'，则生成 'updateAboutPage'
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -42,6 +25,8 @@ function loadContent(page) {
             script.src = `static/js/${page}.js`;
             // 设置一个事件处理器，当 <script> 文件加载完成时执行
             script.onload = () => {
+                // 调用对应的初始化函数
+                //const initFunctionName = `update${capitalizeFirstLetter(page)}Page`;
                 // 检查是否存在这个初始化函数，并在存在时调用它。这确保了每个页面加载后，能够执行其特定的初始化逻辑
                 if (typeof window[`update${capitalizeFirstLetter(page)}Page`] === 'function') {
                     window[`update${capitalizeFirstLetter(page)}Page`]();

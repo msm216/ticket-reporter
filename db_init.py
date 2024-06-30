@@ -1,90 +1,22 @@
 import os
 import random
-
-from flask import current_app
-
-from app import create_app, db
-from app.models import Task, Ticket, Project
 from datetime import datetime, timezone, timedelta
 
-from app.utilities import date_to_id, generate_random_coordinates, generate_random_string, generate_random_date
+from sqlalchemy.exc import IntegrityError
+
+from app import create_app, db
+from app.models import *
+from app.utilities import *
+
+#from config import Config
 
 
-app = create_app()
-
-
-with app.app_context() as app_ctx:
-    
-    # 手动创建应用上下文，确保正常使用 Flask 应用的全局变量和扩展
-    app_ctx.push()
-    print(f"Current app: {current_app.name}")
-    
-
-    # 重置数据库
-    db.drop_all()
-    db.create_all()
-
-    # Create initial projects
-    projects = []
-    for _ in range(3):
-        # 今天减去随机时间差（90天内）
-        create_on_date = datetime.now(timezone.utc) - timedelta(days=random.randint(1, 90))
-        # 获取随机经纬度
-        latitude, longitude = generate_random_coordinates()
-        project = Project(
-            title=f"Project-{generate_random_string(10)}",
-            charger_amount=random.randint(1, 10),
-            latitude=latitude,
-            longitude=longitude,
-            create_on=create_on_date
-        )
-        project.id = Project.generate_id(create_on_date)
-        projects.append(project)
-        db.session.add(project)
-    db.session.commit()
-
-    # Create initial tickets
-    tickets = []
-    for _ in range(10):
-        # 今天减去随机时间差（60天内）
-        report_on_date = datetime.now(timezone.utc) - timedelta(days=random.randint(1, 60))
-        ticket = Ticket(
-            title=f"Ticket-{generate_random_string(10)}",
-            report_on=report_on_date,
-            # 随机绑定 project
-            project_id=random.choice(projects).id if random.random() > 0.5 else None,
-            description=f"This happend: {generate_random_string(50)}"
-        )
-        ticket.id = Ticket.generate_id(report_on_date)
-        tickets.append(ticket)
-        db.session.add(ticket)
-    db.session.commit()
-
-    # Create initial tasks
-    for _ in range(50):
-        # 今天减去随机时间差（30天内）
-        execute_on_date = datetime.now(timezone.utc) - timedelta(days=random.randint(1, 30))
-        task = Task(
-            execute_on=execute_on_date,
-            ticket_id=random.choice(tickets).id,
-            description=f"This has been done: {generate_random_string(50)}",
-            effort_hour=random.randint(1, 8)
-        )
-        task.id = Task.generate_id(execute_on_date)
-        db.session.add(task)
-    db.session.commit()
-
-    # Update update_on for tickets
-    for ticket in tickets:
-        ticket.update_update_on()
-        db.session.add(ticket)
-    db.session.commit()
-
-    # 销毁当前的应用上下文
-    app_ctx.pop()
-
-
-
+# 一些数据实例信息
+clients = {
+    'EVN': {}, 
+    'Energie360': {}, 
+    'Transtema': {}
+}
 
 
 if __name__ == '__main__':
@@ -95,9 +27,142 @@ if __name__ == '__main__':
 
         # 关闭当前会话
         db.session.remove()
+        # 'instance\\report.db'
+        db_path = app.config['SQLALCHEMY_DATABASE_URI'].replace('sqlite:///', '')
+        # 删除db文件
+        if os.path.exists(db_path):
+            os.remove(db_path)
+            print(f'Database file removed: {db_path}')
+        else:
+            print(f'Database file {db_path} not found.')
+        # 删除表格
+        db.drop_all()
+        print("Tables dropped.")
+        # 创建表格
+        db.create_all()
+        print("Tables created.")
+      
+
+        # 记录 Client 实例用于随机分配给 Site 实例
+        client_instances = []
+        # 创建 Client 实例
+        for key, value in clients.items():
+            new_client = Client(name=key)
+            client_instances.append(new_client)
+            db.session.add(new_client)
+        try:
+            # 提交组实例到数据库
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            print(f"Error occurred while committing clients: {e}")
 
 
+        # 记录 Site 实例用于随机分配给 Ticket 实例
+        site_instances = []
+        # 创建 Site 实例
+        for i in range(10):
+            random_client = random.choice(client_instances)
+            random_city = f'City_{i}'
+            lati, long = generate_random_coordinates()
+            new_site = Site(
+                owner=random_client.id,
+                city=random_city,
+                name=f'{random_client.name}-{random_city}',
+                opened_on = generate_random_date(90, 120),
+                amount=random.randint(1, 20),
+                latitude=lati,
+                longitude=long,
+            )
+            site_instances.append(new_site)
+            db.session.add(new_site)
+        try:
+            # 提交组实例到数据库
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            print(f"Error occurred while committing site: {e}")
 
-        # 销毁当前的应用上下文
-        app_ctx.pop()
-    
+
+        # 记录 Issue 实例用于随机分配给 Update，Ticket 实例
+        issue_instances = []
+        # 创建 Issue 实例
+        for i in range(15):
+            new_issue = Issue(
+                title=f'Issue_{i}',
+                title_cn=f'问题_{i}',
+                reported_on=generate_random_date(90),
+                category=random.choice(list(Category)),
+                details=f"It was the case that: {generate_random_string(40)}",
+                severity=random.choice(list(Severity)),
+            )
+            site_instances.append(new_issue)
+            db.session.add(new_issue)
+        try:
+            # 提交组实例到数据库
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            print(f"Error occurred while committing issue: {e}")
+
+
+        # 记录 Ticket 实例用于随机分配给 Task 实例
+        ticket_instances = []
+        # 创建 Ticket 实例，并关联到 Site 和 Issue
+        for i in range(20):
+            random_id_head = random.choices(string.ascii_uppercase, k=2)
+            random_site = random.choice(site_instances)
+            ticket = Ticket(
+                id=f"{random_id_head}{generate_random_string(10)}",
+                title=f'{random_site.name}-Ticket_{i}',
+                created_on=generate_random_date(90),
+                details=f"It was reported that: {generate_random_string(40)}",
+                site_id=random_site.id
+            )
+            ticket_instances.append(ticket)
+            db.session.add(ticket)
+            # 随机关联 Issue
+            related_issues = random.sample(issue_instances, random.randint(1, 3))
+            for issue in related_issues:
+                ticket.issues.append(issue)
+        try:
+            # 提交组实例到数据库
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            print(f"Error occurred while committing ticket: {e}")
+
+
+        # 创建 Task 实例
+        for i in range(60):
+            random_ticket = random.choice(ticket_instances)
+            new_task = Task(
+                title=f'Task_{i}',
+                executed_on=generate_random_date(90),
+                details=f'We did {generate_random_string(40)}',
+                issue_id=random_ticket.id
+            )
+            db.session.add(new_task)
+        try:
+            # 提交组实例到数据库
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            print(f"Error occurred while committing task: {e}")
+
+
+         # 创建 Resolution 实例
+        for i in range(60):
+            random_issue = random.choice(issue_instances)
+            new_resolution = Resolution(
+                updated_on=generate_random_date(90),
+                details=f'We can do this: {generate_random_string(40)}',
+                issue_id=random_ticket.id
+            )
+            db.session.add(new_resolution)
+        try:
+            # 提交组实例到数据库
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            print(f"Error occurred while committing resolution: {e}")

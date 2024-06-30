@@ -12,7 +12,8 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from . import db
 #from .models import User, Group
-#from .utilities import date_to_id, date_for_sqlite, allowed_file
+from .utilities import *
+
 
 
 ############## 主要页面 ##############
@@ -21,6 +22,19 @@ from . import db
 def index():
     return render_template('index.html')
 
+'''
 @app.route('/<page>')
 def page(page):
     return render_template(f'{page}.html')
+'''
+
+@app.route('/about')
+def about():
+    last_commit_time = get_last_commit_time()
+    return render_template('about.html', 
+                           last_update_date=last_commit_time)
+
+
+@app.route('/issue')
+def issue():
+    return render_template('issue.html')

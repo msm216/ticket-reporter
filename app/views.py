@@ -10,8 +10,8 @@ from flask import render_template, flash, redirect, url_for, jsonify
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import SQLAlchemyError
 
-from . import db
-#from .models import User, Group
+#from . import db
+from .models import *
 from .utilities import *
 
 

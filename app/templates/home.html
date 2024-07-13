@@ -24,7 +24,10 @@
     </div>
     <div class="form-group">
         <label for="exampleRange">Example range</label>
-        <input type="range" class="form-control-range" id="exampleRange">
+        <div class="range-container">
+            <input type="range" class="form-control-range" id="exampleRange" min="10" max="50" value="16">
+            <span id="rangeValue">{{ rangeValue }}</span>
+        </div>
     </div>
     <div class="form-group">
         <label for="exampleInput">Example input</label>

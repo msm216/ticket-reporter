@@ -1,0 +1,15 @@
+.range-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+#exampleRange {
+    flex-grow: 1;
+}
+
+#rangeValue {
+    margin-left: 10px;
+    width: 30px; /* Adjust width as necessary */
+    text-align: center;
+}

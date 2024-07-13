@@ -1,7 +1,7 @@
 import os
 import pandas as pd
-from datetime import datetime, timedelta, timezone
 
+from datetime import datetime, timedelta, timezone
 from flask import Flask
 from flask import current_app as app
 from flask import request
@@ -15,26 +15,23 @@ from .models import *
 from .utilities import *
 
 
-
-############## 主要页面 ##############
+#main = Blueprint('main', __name__)
 
 @app.route('/')
-def index():
-    return render_template('index.html')
-
-'''
-@app.route('/<page>')
-def page(page):
-    return render_template(f'{page}.html')
-'''
-
-@app.route('/about')
-def about():
-    last_commit_time = get_last_commit_time()
-    return render_template('about.html', 
-                           last_update_date=last_commit_time)
+def home():    
+    return render_template('home.html')
 
 
 @app.route('/issue')
-def issue():
+def issue():    
     return render_template('issue.html')
+
+
+@app.route('/ticket')
+def ticket():
+    return render_template('ticket.html')
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html')

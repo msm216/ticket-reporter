@@ -1,2 +1,33 @@
-<h1>Ticket</h1>
-<p>This is the ticket page content.</p>
+{% extends "base.html" %}
+{% block title %}Ticket{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ticket.css') }}">
+{% endblock %}
+{% block content %}
+<h1>Ticket Page</h1>
+<p>Welcome to the Ticket page.</p>
+<!-- Add ticket page specific content here -->
+{% endblock %}
+{% block control %}
+<form>
+    <div class="form-group">
+        <label for="ticketNumber">Ticket Number</label>
+        <input type="text" class="form-control" id="ticketNumber" placeholder="Enter ticket number">
+    </div>
+    <div class="form-group">
+        <label for="ticketStatus">Status</label>
+        <select class="form-control" id="ticketStatus">
+            <option>Open</option>
+            <option>In Progress</option>
+            <option>Closed</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="ticketDescription">Description</label>
+        <textarea class="form-control" id="ticketDescription" rows="3"></textarea>
+    </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/ticket.js') }}"></script>
+{% endblock %}

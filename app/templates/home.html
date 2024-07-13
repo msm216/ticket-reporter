@@ -1,2 +1,37 @@
-<h1>Home</h1>
-<p>This is the home page content.</p>
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+{% block content %}
+<h1>Index Page</h1>
+<p>Welcome to the Index page.</p>
+<!-- Add ticket page specific content here -->
+<div id="paragraph-container"></div>
+{% endblock %}
+{% block control %}
+<button id="add-paragraph-btn" class="btn btn-primary">Add Paragraph</button>
+<form>
+    <div class="form-group">
+        <label for="exampleSelect">Example select</label>
+        <select class="form-control" id="exampleSelect">
+            <option>Option 1</option>
+            <option>Option 2</option>
+            <option>Option 3</option>
+            <option>Option 4</option>
+            <option>Option 5</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="exampleRange">Example range</label>
+        <input type="range" class="form-control-range" id="exampleRange">
+    </div>
+    <div class="form-group">
+        <label for="exampleInput">Example input</label>
+        <input type="text" class="form-control" id="exampleInput" placeholder="Enter something">
+    </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+{% endblock %}

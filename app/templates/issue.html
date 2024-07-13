@@ -1,2 +1,33 @@
-<h1>Issue</h1>
-<p>This is the issue page content.</p>
+{% extends "base.html" %}
+{% block title %}Issue{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/issue.css') }}">
+{% endblock %}
+{% block content %}
+<h1>Issue Page</h1>
+<p>Welcome to the Issue page.</p>
+<!-- Add task page specific content here -->
+{% endblock %}
+{% block control %}
+<form>
+    <div class="form-group">
+        <label for="taskName">Issue Name</label>
+        <input type="text" class="form-control" id="taskName" placeholder="Enter task name">
+    </div>
+    <div class="form-group">
+        <label for="taskPriority">Priority</label>
+        <select class="form-control" id="taskPriority">
+            <option>Low</option>
+            <option>Medium</option>
+            <option>High</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="taskDueDate">Due Date</label>
+        <input type="date" class="form-control" id="taskDueDate">
+    </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/issue.js') }}"></script>
+{% endblock %}

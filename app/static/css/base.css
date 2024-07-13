@@ -1,0 +1,41 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    /* overflow-y: scroll; /* Always show vertical scrollbar */
+}
+.navbar-fixed-top {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1030;
+}
+.container-fluid {
+    padding-top: 70px; /* Make space for the fixed navbar */
+}
+.main-row {
+    display: flex;
+    height: calc(100vh - 70px);
+}
+.left-panel {
+    flex-grow: 1;
+    overflow-y: scroll; /* Always show vertical scrollbar */
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+    padding: 20px;
+    margin-right: 230px; /* Adjust this to the width of the right-panel */
+    box-sizing: border-box; /* Ensure padding and margin are included in width calculation */
+}
+.left-panel p {
+    word-wrap: break-word; /* Ensure text wraps within the container */
+}
+.right-panel {
+    position: fixed;
+    top: 70px;
+    right: 0;
+    height: calc(100vh - 70px);
+    width: 240px;
+    overflow-y: auto; /* Independent vertical scrollbar */
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+    background-color: #f8f9fa;
+    padding: 20px;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+}

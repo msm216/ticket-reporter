@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Flask App{% endblock %}</title>
+    <title>{% block title %}Sungrow Ticket Monitor{% endblock %}</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     {% block head %}{% endblock %}
@@ -31,6 +31,10 @@
     <div class="container-fluid">
         <div class="main-row">
             <div class="left-panel">
+                <div class="content-header">
+                    <h1>{% block page_header %}{% endblock %}</h1>
+                    <p>{% block page_subheader %}{% endblock %}</p>
+                </div>
                 <!-- Content of Pages -->
                 {% block content %}{% endblock %}
             </div>

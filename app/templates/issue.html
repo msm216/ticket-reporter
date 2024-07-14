@@ -1,11 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Issue{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/issue.css') }}">
 {% endblock %}
+{% block page_header %}Fixed Issue Header{% endblock %}
+{% block page_subheader %}Welcome to the Issue page.{% endblock %}
 {% block content %}
-<h1>Issue Page</h1>
-<p>Welcome to the Issue page.</p>
 <!-- Add task page specific content here -->
 {% endblock %}
 {% block control %}

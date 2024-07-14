@@ -1,11 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Ticket{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/ticket.css') }}">
 {% endblock %}
+{% block page_header %}Fixed Ticket Header{% endblock %}
+{% block page_subheader %}Welcome to the Ticket page.{% endblock %}
 {% block content %}
-<h1>Ticket Page</h1>
-<p>Welcome to the Ticket page.</p>
 <!-- Add ticket page specific content here -->
 {% endblock %}
 {% block control %}

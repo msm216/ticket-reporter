@@ -1,14 +1,15 @@
 html, body {
     height: 100%;
     margin: 0;
-    /* overflow-y: scroll; /* Always show vertical scrollbar */
 }
 .navbar-fixed-top {
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1030;
+    border-bottom: 1px solid #ddd;
 }
+/* ***************** BELOW NAVIGATION ***************** */
 .container-fluid {
     padding-top: 70px; /* Make space for the fixed navbar */
 }
@@ -16,17 +17,31 @@ html, body {
     display: flex;
     height: calc(100vh - 70px);
 }
+/* ***************** LEFT HALF ***************** */
 .left-panel {
     flex-grow: 1;
     overflow-y: scroll; /* Always show vertical scrollbar */
     overflow-x: hidden; /* Hide horizontal scrollbar */
     padding: 20px;
+    margin-top: 120px; /* Adjust according to the height of the fixed header */
     margin-right: 230px; /* Adjust this to the width of the right-panel */
     box-sizing: border-box; /* Ensure padding and margin are included in width calculation */
+}
+.content-header {
+    position: fixed;
+    top: 70px;
+    left: 10px;
+    width: calc(100% - 270px); /* Adjust according to the right-panel width */
+    background-color: white;
+    z-index: 1020;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 .left-panel p {
     word-wrap: break-word; /* Ensure text wraps within the container */
 }
+/* ***************** RIGHT HALF ***************** */
 .right-panel {
     position: fixed;
     top: 70px;

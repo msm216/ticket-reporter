@@ -1,12 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Index{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
 {% endblock %}
+{% block page_header %}Fixed Home Header{% endblock %}
+{% block page_subheader %}Welcome to the Home page.{% endblock %}
 {% block content %}
-<h1>Index Page</h1>
-<p>Welcome to the Index page.</p>
-<!-- Add ticket page specific content here -->
 <div id="paragraph-container"></div>
 {% endblock %}
 {% block control %}

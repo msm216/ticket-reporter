@@ -35,4 +35,5 @@ def ticket():
 @app.route('/about')
 def about():
     return render_template('about.html',
+                           # 可调用对象 lambda 确保每次实例化时都会重新获得该日期
                            last_update_date=get_last_commit_time())

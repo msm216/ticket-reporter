@@ -21,7 +21,7 @@ class Severity(enum.Enum):
 class Category(enum.Enum):
     feature = "feature"
     quality = "quality"
-    abnormality = "abnormality"
+    abnormality = "firmware"
     connectivity = "connectivity"
     platform = "platform"
 
@@ -39,6 +39,7 @@ ticket_issue_association = Table('ticket_issue', db.Model.metadata,
 )
 
 
+# | id | name |
 # Client <-- Site
 class Client(db.Model):
 
@@ -53,6 +54,7 @@ class Client(db.Model):
         return f'<Client: {self.id}>'
 
 
+# | id | name | amount | open_on | city | latitude | longitude | owner |
 # Site --> Client
 # Site <-- Ticket
 class Site(db.Model):
@@ -63,8 +65,7 @@ class Site(db.Model):
     name = db.Column(db.String(40), nullable=False, unique=True)
     # 场站设备数量
     amount = db.Column(db.Integer, default=0, nullable=False)
-    # 可调用对象 lambda 确保每次实例化时都会重新获得当前日期时间，而不是服务器启动时的日期时间
-    opened_on = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
+    open_on = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
     city = db.Column(db.String(20), default='Test')
     latitude = db.Column(db.Float, nullable=True)
     longitude = db.Column(db.Float, nullable=True)
@@ -77,6 +78,7 @@ class Site(db.Model):
         return f'<Site: {self.name}>'
 
 
+# | id | title | title_cn | report_on | category | latitude | longitude | owner |
 # Issue <-- Resolution
 # Issue <-> Ticket
 class Issue(db.Model):
@@ -86,21 +88,19 @@ class Issue(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(40), nullable=False, unique=True)
     title_cn = db.Column(db.String(40), nullable=True, unique=True)
-    # 可调用对象 lambda 确保每次实例化时都会重新获得当前日期时间，而不是服务器启动时的日期时间
-    reported_on = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
+    report_on = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
     category = db.Column(Enum(Category), nullable=True)
     details = db.Column(db.String(80), nullable=False)
     severity = db.Column(Enum(Severity), nullable=True)
     first_resolution_on = db.Column(db.DateTime, nullable=True)
     first_resolution = db.Column(db.String(80), nullable=True)
     last_resolution_on = db.Column(db.DateTime, nullable=True)
-    last_resolution = db.Column(db.String(80), nullable=True)
+    final_resolution = db.Column(db.String(80), nullable=True)
     status = db.Column(Enum(Status), default=Status.analyzing, nullable=False)
     # 反向关联 Resolution，lazy='dynamic' 使得反向关系被访问时返回一个对象而不是列表
     resolutions = db.relationship('Resolution', backref='issue_ref', lazy=True)
     # 与 Ticket 的多对多关系
     tickets = db.relationship('Ticket', secondary=ticket_issue_association, back_populates='issues')
-
 
     def __repr__(self):
         return f'<Issue: {self.title}>'

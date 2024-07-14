@@ -7,16 +7,6 @@ from datetime import datetime, timezone, timedelta
 
 
 
-def get_last_modified_time(directory):
-    latest_time = None
-    for root, dirs, files in os.walk(directory):
-        for fname in files:
-            filepath = os.path.join(root, fname)
-            file_mtime = datetime.datetime.fromtimestamp(os.path.getmtime(filepath))
-            if latest_time is None or file_mtime > latest_time:
-                latest_time = file_mtime
-    return latest_time
-
 # 生成特定长度随机字符串
 def generate_random_string(length:int) -> str:
     # string.punctuation 特殊字符
@@ -24,6 +14,7 @@ def generate_random_string(length:int) -> str:
     random_string = ''.join(
         random.choice(characters) for i in range(length))
     return random_string
+
 
 # 生成矩形范围内随机经纬度
 def generate_random_coordinates() -> tuple[float, float]:
@@ -37,6 +28,7 @@ def generate_random_coordinates() -> tuple[float, float]:
     longitude = random.uniform(min_longitude, max_longitude)
     return latitude, longitude
 
+
 # 生成回溯天数内的随机时间戳
 def generate_random_date(*args) -> datetime:
     if len(args) == 1:
@@ -49,6 +41,7 @@ def generate_random_date(*args) -> datetime:
     some_day = datetime.now(timezone.utc) - timedelta(days=random.randint(start_day, roll_back))
     return some_day
 
+
 # 确保日期格式为 <class 'datetime.datetime'>
 def date_for_sqlite(meta_date:str) -> datetime:
     if meta_date == '':
@@ -57,14 +50,17 @@ def date_for_sqlite(meta_date:str) -> datetime:
         new_date = datetime.strptime(meta_date, '%Y-%m-%d')
     return new_date
 
+
 # 根据类名和实例日期生成id
 def date_to_id(model_name, date, sequence_number) -> str:
     date_str = date.strftime("%Y%m%d")
     return f"{model_name}-{date_str}-{sequence_number:03d}"
 
+
 # 验证文件扩展名
 def allowed_file(filename:str) -> bool:
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'csv', 'xlsx'}
+
 
 # 获取git最后提交日期
 def get_last_commit_time() -> datetime:

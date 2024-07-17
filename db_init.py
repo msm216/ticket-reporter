@@ -1,7 +1,8 @@
 import os
 import random
-from datetime import datetime, timezone, timedelta
+import json
 
+from datetime import datetime, timezone, timedelta
 from sqlalchemy.exc import IntegrityError
 
 from app import create_app, db
@@ -13,9 +14,11 @@ from app.utilities import *
 
 # 一些数据实例信息
 clients = {
-    'EVN': {}, 
-    'Energie360': {}, 
-    'Transtema': {}
+    'Lidl': {}, 
+    'Aldi': {}, 
+    'Total': {},
+    'Shell': {},
+    'Tamoil': {}
 }
 
 
@@ -35,19 +38,75 @@ if __name__ == '__main__':
             print(f'Database file removed: {db_path}')
         else:
             print(f'Database file {db_path} not found.')
-        # 删除表格
+        # 重新创建表格
         db.drop_all()
         print("Tables dropped.")
-        # 创建表格
         db.create_all()
         print("Tables created.")
-      
 
-        # 记录 Client 实例用于随机分配给 Site 实例
-        client_instances = []
+
+        # 空列表用于记录创建的实例
+        client_inst = []
+        device_inst = []
+        site_inst = []
+        ticket_inst = []
+        task_inst = []
+        issue_inst = []
+        resolution_inst = []
+
+        # JSON 数据路径
+        json_path = os.path.join('data', 'samples', 'sites.json')
+        # 读取和解析 JSON 文件
+        with open(json_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        # 根据 JSON 数据创建数据实例
+        for client, sites in data.items():
+            # 创建 Client 实例
+            # | id | name | (sites) |
+            new_client = Client(
+                name=client
+            )
+
+            for name, details in sites.items():
+
+
+
+
+
+
+
+
         # 创建 Client 实例
-        for key, value in clients.items():
-            new_client = Client(name=key)
+        # | id | name | (sites) |
+        # Client <-- Site
+        for i in range(5):
+            new_client = Site(
+                name=f'{random_client.name}-{random_city}',
+                opened_on = generate_random_date(90, 120),
+                amount=random.randint(1, 20),
+                latitude=lati,
+                longitude=long,
+            )
+            site_instances.append(new_site)
+            db.session.add(new_site)
+        try:
+            # 提交组实例到数据库
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            print(f"Error occurred while committing site: {e}")
+
+
+
+
+
+
+
+
+
+        # 创建 Client 实例
+        for name, _ in clients.items():
+            new_client = Client(name=name)
             client_instances.append(new_client)
             db.session.add(new_client)
         try:
@@ -58,8 +117,10 @@ if __name__ == '__main__':
             print(f"Error occurred while committing clients: {e}")
 
 
-        # 记录 Site 实例用于随机分配给 Ticket 实例
-        site_instances = []
+        # | id | name | amount | open_on | city | latitude | longitude | owner_id | (tickets) |
+        # Site --> Client
+        # Site <-- Ticket
+ 
         # 创建 Site 实例
         for i in range(10):
             random_client = random.choice(client_instances)

@@ -6,6 +6,17 @@ import subprocess
 from datetime import datetime, timezone, timedelta
 
 
+# 生成随机序列号
+def generate_random_sn() -> str:
+    sn = "A" + str(random.randint(10**9, 10**10 - 1))
+    return sn
+
+
+# 生成随机Ticket号
+def generate_random_ticket() -> str:
+    ticket_id = ''.join(random.choices(string.ascii_uppercase, k=2)) + ''.join(random.choices(string.digits, k=10))
+    return ticket_id
+
 
 # 生成特定长度随机字符串
 def generate_random_string(length:int) -> str:
@@ -29,8 +40,12 @@ def generate_random_coordinates() -> tuple[float, float]:
     return latitude, longitude
 
 
-# 生成回溯天数内的随机时间戳
-def generate_random_date(*args) -> datetime:
+# 生成特定范围内随机时间戳
+# generate_random_date(30, 90)  # 过去90天至30天范围内的随机日期
+# generate_random_date(90, origin=datetime(2024, 1, 1))  # 过去90天至基准日期（2024-01-01）范围内的随机日期
+# generate_random_date(30, 90, origin=datetime(2024, 1, 1), direction=False)  # 基准日期（2024-01-01）之后30至90天范围内的随机日期
+def generate_random_date(*args, origin=None, direction=True) -> datetime:
+    # 随机日期范围
     if len(args) == 1:
         roll_back = args[0]
         start_day = 0
@@ -38,7 +53,15 @@ def generate_random_date(*args) -> datetime:
         start_day, roll_back = args
     else:
         raise ValueError("Function accepts either 1 or 2 arguments only.")
-    some_day = datetime.now(timezone.utc) - timedelta(days=random.randint(start_day, roll_back))
+    # 判断基准时间
+    if origin is None:
+        origin = datetime.now(timezone.utc)
+    delta_days = random.randint(start_day, roll_back)
+    # 回溯或前推
+    if direction:
+        some_day = origin - timedelta(days=delta_days)
+    else:
+        some_day = origin + timedelta(days=delta_days)
     return some_day
 
 

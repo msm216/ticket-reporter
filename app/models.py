@@ -114,7 +114,7 @@ class Device(db.Model):
         return f'<Site: {self.name}>'
     
 
-# | id | name | amount | city | latitude | longitude | owner_id | (devices) | (tickets) |
+# | id | name | address | zip | latitude | longitude | owner_id | (devices) | (tickets) |
 # Site --> Client
 # Site <-- Ticket
 # Site <-- Device
@@ -124,7 +124,8 @@ class Site(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), nullable=False, unique=True)
-    city = db.Column(db.String(20), nullable=True)
+    address = db.Column(db.String(30), nullable=True)
+    zip = db.Column(db.String(20), nullable=True)
     latitude = db.Column(db.Float, nullable=True)
     longitude = db.Column(db.Float, nullable=True)
     # 外键指向一个 Client 实例

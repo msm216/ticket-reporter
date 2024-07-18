@@ -66,9 +66,19 @@ if __name__ == '__main__':
             new_client = Client(
                 name=client
             )
-
+            client_inst.append(new_client)
+            db.session.add(new_site)
             for name, details in sites.items():
+                # 创建 Site 实例
+                # | id | name | address | zip | latitude | longitude | owner_id | (devices) | (tickets) |
+                new_site = Site(
+                    name=name,
+                    address.
+                    zip,
+                    latitude,
+                    
 
+                )
 
 
 

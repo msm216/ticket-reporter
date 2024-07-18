@@ -6,7 +6,6 @@
             "country": "DE",
             "latitude": 48.0686708,
             "longitude": 9.8155347,
-            "amount": 2,
             "devices": {
                 "A5311042147": {
                     "model": "IDC180",
@@ -24,7 +23,6 @@
             "country": "DE",
             "latitude": 48.1499866,
             "longitude": 11.5418691,
-            "amount": 3,
             "devices": {
                 "A6270534671": {
                     "model": "IDC180",
@@ -46,7 +44,6 @@
             "country": "DE",
             "latitude": 47.69565,
             "longitude": 11.484939,
-            "amount": 2,
             "devices": {
                 "A1799945047": {
                     "model": "IDC180",
@@ -64,7 +61,6 @@
             "country": "DE",
             "latitude": 52.50973,
             "longitude": 13.30583,
-            "amount": 2,
             "devices": {
                 "A2511512859": {
                     "model": "IDC180",
@@ -84,7 +80,6 @@
             "country": "DE",
             "latitude": 49.0210975,
             "longitude": 8.2100701,
-            "amount": 3,
             "devices": {
                 "A9077662832": {
                     "model": "IDC180",
@@ -106,7 +101,6 @@
             "country": "DE",
             "latitude": 52.5207625,
             "longitude": 13.420975,
-            "amount": 2,
             "devices": {
                 "A5064692765": {
                     "model": "IDC180",
@@ -126,7 +120,6 @@
             "country": "DE",
             "latitude": 48.1570643,
             "longitude": 11.5413242,
-            "amount": 2,
             "devices": {
                 "A4058883018": {
                     "model": "IDC30",
@@ -146,7 +139,6 @@
             "country": "NL",
             "latitude": 48.0686708,
             "longitude": 9.8155347,
-            "amount": 4,
             "devices": {
                 "A9542423030": {
                     "model": "IDC180",
@@ -172,7 +164,6 @@
             "country": "DE",
             "latitude": 52.5159335,
             "longitude": 13.2291037,
-            "amount": 2,
             "devices": {
                 "A1678547887": {
                     "model": "IDC180",
@@ -192,7 +183,6 @@
             "country": "NL",
             "latitude": 52.0639952,
             "longitude": 4.0383803,
-            "amount": 3,
             "devices": {
                 "A4895250313": {
                     "model": "IDC30",

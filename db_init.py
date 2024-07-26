@@ -12,16 +12,6 @@ from app.utilities import *
 #from config import Config
 
 
-# 一些数据实例信息
-clients = {
-    'Lidl': {}, 
-    'Aldi': {}, 
-    'Total': {},
-    'Shell': {},
-    'Tamoil': {}
-}
-
-
 if __name__ == '__main__':
 
     app = create_app()
@@ -59,31 +49,48 @@ if __name__ == '__main__':
         # 读取和解析 JSON 文件
         with open(json_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
-        # 根据 JSON 数据创建数据实例
-        for client, sites in data.items():
-            # 创建 Client 实例
+        # 创建 Client 实例
+        for client_name, sites in data.items():
             # | id | name | (sites) |
             new_client = Client(
-                name=client
+                name=client_name
             )
             client_inst.append(new_client)
-            db.session.add(new_site)
-            for name, details in sites.items():
-                # 创建 Site 实例
+            db.session.add(new_client)
+            print(f"New client added: {new_client}")
+            # 创建 Site 实例
+            for site_name, details in sites.items():
                 # | id | name | address | zip | latitude | longitude | owner_id | (devices) | (tickets) |
                 new_site = Site(
-                    name=name,
-                    address.
-                    zip,
-                    latitude,
-                    
-
+                    name=site_name,
+                    address=details['address'],
+                    zip=details['zip'],
+                    latitude=details['latitude'],
+                    longitude=details['longitude'],
+                    owner_id=new_client.id
                 )
+                site_inst.append(new_site)
+                db.session.add(new_site)
+                print(f"New site added: {new_site}")
+                # 创建 Site 实例
+                for device_sn, info in details['devices']:
+                    # | sn | model | install_on | site_id |
+                    new_device = Device(
+                        sn=device_sn,
+                        model=info['model'],
+                        install_on=datetime.strptime(info['install_on'], '%Y-%m-%d'),
+                        site_id=new_site.id
+                    )
+                    device_inst.append(new_device)
+                    db.session.add(new_device)
+                    print(f"New device added: {new_device}")
+        db.session.commit()
+        print(f"Committed:\n{len(client_inst)} clients\n{len(site_inst)} sites\n{len(device_inst)} devices to the database.")
 
 
 
 
-
+        '''
 
 
         # 创建 Client 实例
@@ -105,13 +112,6 @@ if __name__ == '__main__':
         except IntegrityError as e:
             db.session.rollback()
             print(f"Error occurred while committing site: {e}")
-
-
-
-
-
-
-
 
 
         # 创建 Client 实例
@@ -237,3 +237,4 @@ if __name__ == '__main__':
         except IntegrityError as e:
             db.session.rollback()
             print(f"Error occurred while committing resolution: {e}")
+        '''

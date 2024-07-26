@@ -8,14 +8,20 @@ from datetime import datetime, timezone, timedelta
 
 # 生成随机序列号
 def generate_random_sn() -> str:
-    sn = "A" + str(random.randint(10**9, 10**10 - 1))
-    return sn
+    serial_number = "A" + str(random.randint(10**9, 10**10 - 1))
+    return serial_number
 
 
 # 生成随机Ticket号
 def generate_random_ticket() -> str:
     ticket_id = ''.join(random.choices(string.ascii_uppercase, k=2)) + ''.join(random.choices(string.digits, k=10))
     return ticket_id
+
+
+# 根据类名和实例日期生成id
+def date_to_id(model_name, date, sequence_number) -> str:
+    date_str = date.strftime("%Y%m%d")
+    return f"{model_name}-{date_str}-{sequence_number:03d}"
 
 
 # 生成特定长度随机字符串
@@ -72,12 +78,6 @@ def date_for_sqlite(meta_date:str) -> datetime:
     else:
         new_date = datetime.strptime(meta_date, '%Y-%m-%d')
     return new_date
-
-
-# 根据类名和实例日期生成id
-def date_to_id(model_name, date, sequence_number) -> str:
-    date_str = date.strftime("%Y%m%d")
-    return f"{model_name}-{date_str}-{sequence_number:03d}"
 
 
 # 验证文件扩展名

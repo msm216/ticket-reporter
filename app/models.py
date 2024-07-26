@@ -76,7 +76,7 @@ ticket_issue_association = Table('ticket_issue', db.Model.metadata,
 # Ticket <--> Device 关联表
 ticket_device_association = Table('ticket_device', db.Model.metadata,
     Column('ticket_id', Integer, ForeignKey('ticket_table.id')),
-    Column('device_id', Integer, ForeignKey('device_table.id'))
+    Column('device_sn', Integer, ForeignKey('device_table.sn'))
 )
 
 
@@ -86,21 +86,34 @@ class Client(db.Model):
 
     __tablename__ = 'client_table'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(20), primary_key=True)
     name = db.Column(db.String(40), nullable=False, unique=True)
     # 反向关联 Site
     sites = db.relationship('Site', backref='client_ref', lazy=True)
 
     def __repr__(self):
         return f'<Client: {self.id}>'
+    
+    @staticmethod
+    def generate_client_id(mapper, connection, target):
+        max_id = db.session.query(db.func.max(Client.id)).scalar()
+        if max_id:
+            new_id_num = int(max_id.split('-')[1]) + 1
+        else:
+            new_id_num = 1
+        target.id = f'CLIENT-{new_id_num:03d}'
+
+# 将事件监听器绑定到 Client 类的 before_insert 事件上
+event.listen(Client, 'before_insert', Client.generate_client_id)
 
 
-# | id | model | install_on | site_id |
+
+# | sn | model | install_on | site_id |
 # Device --> Site
 # Device <-> Ticket
 class Device(db.Model):
 
-    __tablename__ = 'divice_table'
+    __tablename__ = 'device_table'
 
     sn = db.Column(db.String(20), primary_key=True)
     model = db.Column(Enum(Model), nullable=True)
@@ -113,6 +126,14 @@ class Device(db.Model):
     def __repr__(self):
         return f'<Site: {self.name}>'
     
+    @staticmethod
+    def generate_device_sn(mapper, connection, target):
+        target.sn = generate_random_sn()
+
+# 将事件监听器绑定到 Device 类的 before_insert 事件上
+event.listen(Device, 'before_insert', Device.generate_device_sn)
+
+
 
 # | id | name | address | zip | latitude | longitude | owner_id | (devices) | (tickets) |
 # Site --> Client
@@ -122,7 +143,7 @@ class Site(db.Model):
 
     __tablename__ = 'site_table'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(20), primary_key=True)
     name = db.Column(db.String(40), nullable=False, unique=True)
     address = db.Column(db.String(30), nullable=True)
     zip = db.Column(db.String(20), nullable=True)
@@ -137,9 +158,22 @@ class Site(db.Model):
 
     def __repr__(self):
         return f'<Site: {self.name}>'
+    
+    @staticmethod
+    def generate_site_id(mapper, connection, target):
+        max_id = db.session.query(db.func.max(Site.id)).scalar()
+        if max_id:
+            new_id_num = int(max_id.split('-')[1]) + 1
+        else:
+            new_id_num = 1
+        target.id = f'SITE-{new_id_num:03d}'
+
+# 将事件监听器绑定到 Site 类的 before_insert 事件上
+event.listen(Site, 'before_insert', Site.generate_site_id)
 
 
-# | id | title | title_cn | creat_on | type | details | status | first_response | first_response_on |
+
+# | id | title | title_cn | create_on | type | details | status | first_response | first_response_on |
 # | final_resolution | close_on | (issues) |
 # Ticket --> Site
 # Ticket <-> Issue
@@ -150,7 +184,7 @@ class Ticket(db.Model):
     id = db.Column(db.String(20), primary_key=True)
     title = db.Column(db.String(40), nullable=False, unique=True)
     title_cn = db.Column(db.String(40), nullable=False, unique=True)
-    creat_on = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
+    create_on = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
     # 外键指向一个 Site 实例
     site_id = db.Column(db.String(20), db.ForeignKey('site_table.id'), default=None)
     type = db.Column(Enum(Type), nullable=True)
@@ -165,6 +199,14 @@ class Ticket(db.Model):
 
     def __repr__(self):
         return f'<Ticket: {self.title}>'
+    
+    @staticmethod
+    def generate_ticket_id(mapper, connection, target):
+        target.id = generate_random_ticket()
+
+# 将事件监听器绑定到 Ticket 类的 before_insert 事件上
+event.listen(Ticket, 'before_insert', Ticket.generate_ticket_id)
+
 
 
 # | id | execute_on | action | detail | result | first_response | ticket_id |
@@ -173,7 +215,7 @@ class Task(db.Model):
 
     __tablename__ = 'task_table'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(20), primary_key=True)
     execute_on = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
     action = db.Column(Enum(Action), nullable=True)
     detail = db.Column(db.String(80), nullable=False)
@@ -183,6 +225,23 @@ class Task(db.Model):
 
     def __repr__(self):
         return f'<Resolution: {self.id}>'
+    
+    @staticmethod
+    def generate_task_id(mapper, connection, target):
+        execute_date_str = target.execute_on.strftime('%Y%m%d')
+        existing_tasks = db.session.query(Task).filter(
+            db.func.strftime('%Y%m%d', Task.execute_on) == execute_date_str
+        ).all()
+        if existing_tasks:
+            max_id_num = max([int(task.id.split('-')[-1]) for task in existing_tasks])
+            new_id_num = max_id_num + 1
+        else:
+            new_id_num = 1
+        target.id = f'ISSUE-{execute_date_str}-{new_id_num:02d}'
+
+# 绑定事件监听器
+event.listen(Task, 'before_insert', Task.generate_task_id)
+
     
 
 # | id | title | title_cn | report_on | category | details | severity | progress |

@@ -84,6 +84,7 @@ class Action(enum.Enum):
 
 # Result of Task
 class Result(enum.Enum):
+    pending = "pending"
     observation = "observation"
     solved = "solved"
     failed = "failed"
@@ -204,10 +205,10 @@ class Ticket(db.Model):
 
     id = Column(String(20), primary_key=True)
     title = Column(String(40), nullable=False, unique=True)
-    title_cn = Column(String(40), nullable=False, unique=True)
+    title_cn = Column(String(40), nullable=True, unique=True)
     create_on = Column(DateTime, default=lambda: datetime.now(timezone.utc).date())
     ticket_type = Column(Enum(Type), nullable=True)
-    details = Column(String(80), nullable=False)
+    description = Column(String(80), nullable=False)
     status = Column(Enum(Status), default=Status.open, nullable=False)
     first_response = Column(String(80), nullable=True)
     first_response_on = Column(DateTime, nullable=True)
@@ -239,9 +240,9 @@ class Task(db.Model):
 
     id = Column(String(20), primary_key=True)
     execute_on = Column(DateTime, default=lambda: datetime.now(timezone.utc).date())
-    action = Column(Enum(Action), nullable=True)
-    detail = Column(String(80), nullable=False)
-    result = Column(Enum(Result), nullable=True)
+    action = Column(Enum(Action), nullable=False)
+    description = Column(String(80), nullable=False)
+    result = Column(Enum(Result), default=Result.pending, nullable=False)
     # 外键指向一个 Ticket 实例
     ticket_id = Column(String(20), ForeignKey('ticket_table.id'), nullable=True)
 
@@ -250,8 +251,8 @@ class Task(db.Model):
     
     # 根据日期生成ID
     @staticmethod
-    def generate_task_id(cls, mapper, connection, target):
-        target.id = date_based_id(cls, target, db.session, prefix='TASK')
+    def generate_task_id(mapper, connection, target):
+        target.id = date_based_id(Task, target, db.session, 'execute_on', prefix='TASK')
         return
 
 # 绑定事件监听器
@@ -271,8 +272,8 @@ class Issue(db.Model):
     title = Column(String(40), nullable=False, unique=True)
     title_cn = Column(String(40), nullable=True, unique=True)
     report_on = Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
-    category = Column(Enum(Category), nullable=True)
-    details = Column(String(80), nullable=False)
+    category = Column(Enum(Category), nullable=False)
+    description = Column(String(80), nullable=False)
     severity = Column(Enum(Severity), nullable=True)
     progress = Column(Enum(Progress), default=Progress.analyzing, nullable=False)
     final_resolution = Column(String(80), nullable=True)
@@ -287,8 +288,8 @@ class Issue(db.Model):
     
     # 根据日期生成ID
     @staticmethod
-    def generate_issue_id(cls, mapper, connection, target):
-        target.id = date_based_id(cls, target, db.session, prefix='ISSUE')
+    def generate_issue_id(mapper, connection, target):
+        target.id = date_based_id(Issue, target, db.session, 'report_on', prefix='ISSUE')
         return
 
 # 绑定事件监听器
@@ -304,7 +305,7 @@ class Resolution(db.Model):
 
     id = Column(String(20), primary_key=True)
     update_on = Column(DateTime, default=lambda: datetime.now(timezone.utc).date())
-    details = Column(String(80), nullable=False)
+    description = Column(String(80), nullable=False)
     # 外键指向一个 Issue 实例
     issue_id = Column(String(20), ForeignKey('issue_table.id'), nullable=True)
 
@@ -313,8 +314,8 @@ class Resolution(db.Model):
     
     # 根据日期生成ID
     @staticmethod
-    def generate_resolution_id(cls, mapper, connection, target):
-        target.id = date_based_id(cls, target, db.session, prefix='RESUL')
+    def generate_resolution_id( mapper, connection, target):
+        target.id = date_based_id(Resolution, target, db.session, 'update_on', prefix='RESUL')
         return
 
 # 绑定事件监听器

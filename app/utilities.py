@@ -26,17 +26,17 @@ def random_ticket_id() -> str:
 
 
 # 根据类名和实例日期生成id
-def date_based_id(cls, target, session:Session, prefix:str) -> str:
-    execute_date_str = target.execute_on.strftime('%Y%m%d')
-    existing_tasks = session.query(cls).filter(
-        func.strftime('%Y%m%d', cls.execute_on) == execute_date_str
+def date_based_id(model, target, session:Session, date_attr:str, prefix:str) -> str:
+    date_str = getattr(target, date_attr).strftime('%Y%m%d')
+    existing_inst = session.query(model).filter(
+        db.func.strftime('%Y%m%d', getattr(model, date_attr)) == date_str
     ).all()
-    if existing_tasks:
-        max_id_num = max([int(task.id.split('-')[-1]) for task in existing_tasks])
+    if existing_inst:
+        max_id_num = max([int(task.id.split('-')[-1]) for task in existing_inst])
         new_id_num = max_id_num + 1
     else:
         new_id_num = 1
-    return f'{prefix}-{execute_date_str}-{new_id_num:02d}'
+    return f'{prefix}-{date_str}-{new_id_num:02d}'
 
 
 # 生成特定长度随机字符串
@@ -62,9 +62,10 @@ def random_coordinates() -> tuple[float, float]:
 
 
 # 生成特定范围内随机时间戳
-# generate_random_date(30, 90)  # 过去90天至30天范围内的随机日期
-# generate_random_date(90, origin=datetime(2024, 1, 1))  # 过去90天至基准日期（2024-01-01）范围内的随机日期
-# generate_random_date(30, 90, origin=datetime(2024, 1, 1), direction=False)  # 基准日期（2024-01-01）之后30至90天范围内的随机日期
+# random_date(90)  # 过去90天范围内的随机日期
+# random_date(30, 90)  # 过去90天至30天范围内的随机日期
+# random_date(90, origin=datetime(2024, 1, 1))  # 基准日期（2024-01-01）过去90天至范围内的随机日期
+# random_date(30, 90, origin=datetime(2024, 5, 7), direction=False)  # 基准日期（2024-05-07）之后30至90天范围内的随机日期
 def random_date(*args, origin=None, direction=True) -> datetime:
     # 随机日期范围
     if len(args) == 1:

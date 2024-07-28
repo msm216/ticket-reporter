@@ -35,20 +35,17 @@ if __name__ == '__main__':
         print("Tables created.")
 
 
-        # 空列表用于记录创建的实例
-        client_inst = []
-        device_inst = []
-        site_inst = []
-        ticket_inst = []
-        task_inst = []
-        issue_inst = []
-        resolution_inst = []
-
         # JSON 数据路径
         json_path = os.path.join('data', 'samples', 'sites.json')
         # 读取和解析 JSON 文件
         with open(json_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
+
+        # 空列表用于记录创建的实例
+        client_inst = []
+        device_inst = []
+        site_inst = []
+
         # 创建 Client 实例
         for client_name, sites in data.items():
             # | id | name | (sites) |
@@ -57,8 +54,13 @@ if __name__ == '__main__':
             )
             client_inst.append(new_client)
             db.session.add(new_client)
-            db.session.commit()
-            print(f"New client: {new_client} committed")
+            try:
+                db.session.commit()
+                print(f"New device: {new_client} committed")
+            except IntegrityError as e:
+                db.session.rollback()
+                print(f"Error '{e}' occurred while committing {new_client}")
+
             # 创建 Site 实例
             for site_name, details in sites.items():
                 # | id | name | address | zip | latitude | longitude | owner_id | (devices) | (tickets) |
@@ -73,9 +75,14 @@ if __name__ == '__main__':
                 )
                 site_inst.append(new_site)
                 db.session.add(new_site)
-                db.session.commit()
-                print(f"New site: {new_site} committed")
-                # 创建 Site 实例
+                try:
+                    db.session.commit()
+                    print(f"New device: {new_site} committed")
+                except IntegrityError as e:
+                    db.session.rollback()
+                    print(f"Error '{e}' occurred while committing {new_site}")
+                
+                # 创建 Device 实例
                 for device_sn, info in details['devices'].items():
                     # | sn | model | install_on | site_id |
                     new_device = Device(
@@ -87,159 +94,103 @@ if __name__ == '__main__':
                     )
                     device_inst.append(new_device)
                     db.session.add(new_device)
-                    db.session.commit()
-                    print(f"New device: {new_device} committed")
-        
-        print(f"Committed:\n{len(client_inst)} clients\n{len(site_inst)} sites\n{len(device_inst)} devices to the database.")
+                    try:
+                        db.session.commit()
+                        print(f"New device: {new_device} committed")
+                    except IntegrityError as e:
+                        db.session.rollback()
+                        print(f"Error '{e}' occurred while committing {new_device}")
+                       
+        print(f"{len(client_inst)} clients\n{len(site_inst)} sites\n{len(device_inst)} devices\n...added to the database")
+        #############
+        # 5 clients
+        # 10 sites
+        # 25 devices
+        #############
 
 
+        # 空列表用于记录创建的实例
+        ticket_inst = []
+        task_inst = []
 
-
-        '''
-
-
-        # 创建 Client 实例
-        # | id | name | (sites) |
-        # Client <-- Site
-        for i in range(5):
-            new_client = Site(
-                name=f'{random_client.name}-{random_city}',
-                opened_on = generate_random_date(90, 120),
-                amount=random.randint(1, 20),
-                latitude=lati,
-                longitude=long,
-            )
-            site_instances.append(new_site)
-            db.session.add(new_site)
-        try:
-            # 提交组实例到数据库
-            db.session.commit()
-        except IntegrityError as e:
-            db.session.rollback()
-            print(f"Error occurred while committing site: {e}")
-
-
-        # 创建 Client 实例
-        for name, _ in clients.items():
-            new_client = Client(name=name)
-            client_instances.append(new_client)
-            db.session.add(new_client)
-        try:
-            # 提交组实例到数据库
-            db.session.commit()
-        except IntegrityError as e:
-            db.session.rollback()
-            print(f"Error occurred while committing clients: {e}")
-
-
-        # | id | name | amount | open_on | city | latitude | longitude | owner_id | (tickets) |
-        # Site --> Client
-        # Site <-- Ticket
- 
-        # 创建 Site 实例
+        # 创建10个随机 Ticket
         for i in range(10):
-            random_client = random.choice(client_instances)
-            random_city = f'City_{i}'
-            lati, long = generate_random_coordinates()
-            new_site = Site(
-                owner=random_client.id,
-                city=random_city,
-                name=f'{random_client.name}-{random_city}',
-                opened_on = generate_random_date(90, 120),
-                amount=random.randint(1, 20),
-                latitude=lati,
-                longitude=long,
+            new_ticket = Ticket(
+                id=random_ticket_id(),
+                title=random_string(20),
+                create_on=random_date(90),
+                ticket_type=random.choice(list(Type)),
+                description=f"This occured on site: {random_string(40)}",
             )
-            site_instances.append(new_site)
-            db.session.add(new_site)
-        try:
-            # 提交组实例到数据库
-            db.session.commit()
-        except IntegrityError as e:
-            db.session.rollback()
-            print(f"Error occurred while committing site: {e}")
+            ticket_inst.append(new_ticket)
+            db.session.add(new_ticket)
+            try:
+                db.session.commit()
+                print(f"New ticket: {new_ticket} committed")
+            except IntegrityError as e:
+                db.session.rollback()
+                print(f"Error '{e}' occurred while committing {new_ticket}")
 
-
-        # 记录 Issue 实例用于随机分配给 Update，Ticket 实例
-        issue_instances = []
-        # 创建 Issue 实例
+        # 创建15个随机 Task
         for i in range(15):
-            new_issue = Issue(
-                title=f'Issue_{i}',
-                title_cn=f'问题_{i}',
-                reported_on=generate_random_date(90),
-                category=random.choice(list(Category)),
-                details=f"It was the case that: {generate_random_string(40)}",
-                severity=random.choice(list(Severity)),
-            )
-            site_instances.append(new_issue)
-            db.session.add(new_issue)
-        try:
-            # 提交组实例到数据库
-            db.session.commit()
-        except IntegrityError as e:
-            db.session.rollback()
-            print(f"Error occurred while committing issue: {e}")
-
-
-        # 记录 Ticket 实例用于随机分配给 Task 实例
-        ticket_instances = []
-        # 创建 Ticket 实例，并关联到 Site 和 Issue
-        for i in range(20):
-            random_id_head = random.choices(string.ascii_uppercase, k=2)
-            random_site = random.choice(site_instances)
-            ticket = Ticket(
-                id=f"{random_id_head}{generate_random_string(10)}",
-                title=f'{random_site.name}-Ticket_{i}',
-                created_on=generate_random_date(90),
-                details=f"It was reported that: {generate_random_string(40)}",
-                site_id=random_site.id
-            )
-            ticket_instances.append(ticket)
-            db.session.add(ticket)
-            # 随机关联 Issue
-            related_issues = random.sample(issue_instances, random.randint(1, 3))
-            for issue in related_issues:
-                ticket.issues.append(issue)
-        try:
-            # 提交组实例到数据库
-            db.session.commit()
-        except IntegrityError as e:
-            db.session.rollback()
-            print(f"Error occurred while committing ticket: {e}")
-
-
-        # 创建 Task 实例
-        for i in range(60):
-            random_ticket = random.choice(ticket_instances)
+            # 随机分配给一个 Ticket 实例
+            random_ticket = random.choice(ticket_inst)
             new_task = Task(
-                title=f'Task_{i}',
-                executed_on=generate_random_date(90),
-                details=f'We did {generate_random_string(40)}',
-                issue_id=random_ticket.id
+                execute_on=random_date(60),
+                action=random.choice(list(Action)),
+                description=f"This action has been taken: {random_string(20)}",
+                result=random.choice(list(Result)),
+                ticket_id=random_ticket.id
             )
+            task_inst.append(new_task)
             db.session.add(new_task)
-        try:
-            # 提交组实例到数据库
-            db.session.commit()
-        except IntegrityError as e:
-            db.session.rollback()
-            print(f"Error occurred while committing task: {e}")
+            try:
+                db.session.commit()
+                print(f"New tast: {new_task} committed")
+            except IntegrityError as e:
+                db.session.rollback()
+                print(f"Error '{e}' occurred while committing {new_task}")
 
 
-         # 创建 Resolution 实例
-        for i in range(60):
-            random_issue = random.choice(issue_instances)
-            new_resolution = Resolution(
-                updated_on=generate_random_date(90),
-                details=f'We can do this: {generate_random_string(40)}',
-                issue_id=random_ticket.id
+        # 空列表用于记录创建的实例
+        issue_inst = []
+        resolution_inst = []
+
+        # 创建8个随机 Issue
+        for i in range(8):
+            new_issue = Issue(
+                title=random_string(20),
+                report_on=random_date(90),
+                category=random.choice(list(Category)),
+                description=f"This was the issue: {random_string(40)}",
+                severity=random.choice(list(Severity)),
+                progress=random.choice(list(Progress)),
             )
+            issue_inst.append(new_issue)
+            db.session.add(new_issue)
+            try:
+                db.session.commit()
+                print(f"New issue: {new_issue} committed")
+            except IntegrityError as e:
+                db.session.rollback()
+                print(f"Error '{e}' occurred while committing {new_issue}")
+
+        # 创建20个随机 Resolution
+        for i in range(20):
+            # 随机分配给一个 Ticket 实例
+            random_issue = random.choice(issue_inst)
+            new_resolution = Resolution(
+                update_on=random_date(60),
+                description=f"This can solve the issue: {random_string(20)}",
+                issue_id=random_issue.id
+            )
+            resolution_inst.append(new_resolution)
             db.session.add(new_resolution)
-        try:
-            # 提交组实例到数据库
-            db.session.commit()
-        except IntegrityError as e:
-            db.session.rollback()
-            print(f"Error occurred while committing resolution: {e}")
-        '''
+            try:
+                db.session.commit()
+                print(f"New resolution: {new_resolution} committed")
+            except IntegrityError as e:
+                db.session.rollback()
+                print(f"Error '{e}' occurred while committing {new_resolution}")
+
+        # 随机创建多对多关系

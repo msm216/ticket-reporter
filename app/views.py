@@ -32,7 +32,48 @@ def ticket():
     return render_template('ticket.html')
 
 
+@app.route('/ticket/upload', methods=['POST'])
+def upload_ticket():
+    # 检查请求中是否包含文件，如果不存在，显示错误信息并重定向回上传页面
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    # 如果文件名为空，显示错误信息并重定向回上传页面
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+    # 验证文件后缀
+    if file and allowed_file(file.filename):
+        # 确保上传的文件名是安全的，并移除任何可能导致安全问题的字符
+        filename = secure_filename(file.filename)
+        # 构建文件路径
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        # 处理文件
+        if filename.endswith('.csv'):
+            df = pd.read_csv(filepath, parse_dates=['created_on'])
+        elif filename.endswith('.xlsx'):
+            df = pd.read_excel(filepath, parse_dates=['created_on'])
+        else:
+            flash('Unsupported file format')
+            return redirect(request.url)
+
+        ###
+        # 对 df 的格式进行标准化处理
+        ###
+
+        # 将文件内容更新到数据库
+        update_tickets_from_dataframe(df)
+        flash('File successfully uploaded and processed')
+        return redirect(url_for('ticket'))
+
+    flash('File type not allowed')
+    return redirect(request.url)
+
+
 @app.route('/about')
 def about():
     return render_template('about.html',
-                           last_update_date=get_last_commit_time())
+                           last_update_date=last_commit_time())

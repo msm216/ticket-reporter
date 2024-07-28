@@ -1,13 +1,35 @@
 import enum
 
 from datetime import datetime, timezone
-from sqlalchemy import event, Enum, Table, Column, Integer, ForeignKey
+from sqlalchemy import event, Enum, Table, Column, ForeignKey, String, Integer, Float, DateTime
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import relationship
 
 from . import db
-from .utilities import *
+from .utilities import random_serial_number, random_ticket_id, date_based_id
 
 
+
+# Model of Device
+class Country(enum.Enum):
+    AT = "AT"
+    BE = "BE"
+    CZ = "CZ"
+    DK = "DK"
+    FI = "FI"
+    FR = "FR"
+    DE = "DE"
+    IE = "IE"
+    IT = "IT"
+    NL = "NL"
+    NO = "NO"
+    PL = "PL"
+    PT = "PT"
+    SK = "SK"
+    ES = "ES"
+    SE = "SE"
+    CH = "CH"
+    GB = "GB"
 
 # Model of Device
 class Model(enum.Enum):
@@ -68,16 +90,19 @@ class Result(enum.Enum):
 
 
 # Ticket <--> Issue 关联表
-ticket_issue_association = Table('ticket_issue', db.Model.metadata,
-    Column('ticket_id', Integer, ForeignKey('ticket_table.id')),
-    Column('issue_id', Integer, ForeignKey('issue_table.id'))
+ticket_issue_association = Table(
+    'ticket_issue', db.Model.metadata,
+    Column('ticket_id', String(20), ForeignKey('ticket_table.id')),
+    Column('issue_id', String(20), ForeignKey('issue_table.id'))
 )
 
 # Ticket <--> Device 关联表
-ticket_device_association = Table('ticket_device', db.Model.metadata,
-    Column('ticket_id', Integer, ForeignKey('ticket_table.id')),
-    Column('device_sn', Integer, ForeignKey('device_table.sn'))
+ticket_device_association = Table(
+    'ticket_device', db.Model.metadata,
+    Column('ticket_id', String(20), ForeignKey('ticket_table.id')),
+    Column('device_sn', String(20), ForeignKey('device_table.sn'))
 )
+
 
 
 # | id | name | (sites) |
@@ -86,22 +111,20 @@ class Client(db.Model):
 
     __tablename__ = 'client_table'
 
-    id = db.Column(db.String(20), primary_key=True)
-    name = db.Column(db.String(40), nullable=False, unique=True)
+    id = Column(String(20), primary_key=True)
+    name = Column(String(40), nullable=False, unique=True)
     # 反向关联 Site
-    sites = db.relationship('Site', backref='client_ref', lazy=True)
+    sites = relationship('Site', backref='client_ref', lazy=True)
 
     def __repr__(self):
-        return f'<Client: {self.id}>'
+        return f'<Client: {self.name}>'
     
     @staticmethod
     def generate_client_id(mapper, connection, target):
         max_id = db.session.query(db.func.max(Client.id)).scalar()
-        if max_id:
-            new_id_num = int(max_id.split('-')[1]) + 1
-        else:
-            new_id_num = 1
+        new_id_num = int(max_id.split('-')[1]) + 1 if max_id else 1
         target.id = f'CLIENT-{new_id_num:03d}'
+        return
 
 # 将事件监听器绑定到 Client 类的 before_insert 事件上
 event.listen(Client, 'before_insert', Client.generate_client_id)
@@ -115,20 +138,22 @@ class Device(db.Model):
 
     __tablename__ = 'device_table'
 
-    sn = db.Column(db.String(20), primary_key=True)
-    model = db.Column(Enum(Model), nullable=True)
-    install_on = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
+    sn = Column(String(20), primary_key=True)
+    model = Column(Enum(Model), nullable=False)
+    material = Column(String(20), nullable=False)
+    install_on = Column(DateTime, default=lambda: datetime.now(timezone.utc).date())
     # 外键指向一个 Client 实例
-    site_id = db.Column(db.String(20), db.ForeignKey('site_table.id'), default=None)
+    site_id = Column(String(20), ForeignKey('site_table.id'), nullable=True)
     # 与 Ticket 的多对多关系
-    tickets = db.relationship('Ticket', secondary=ticket_device_association, back_populates='devices')
+    tickets = relationship('Ticket', secondary=ticket_device_association, back_populates='devices')
 
     def __repr__(self):
-        return f'<Site: {self.name}>'
+        return f'<Site: {self.sn}>'
     
     @staticmethod
     def generate_device_sn(mapper, connection, target):
-        target.sn = generate_random_sn()
+        target.sn = random_serial_number()
+        return
 
 # 将事件监听器绑定到 Device 类的 before_insert 事件上
 event.listen(Device, 'before_insert', Device.generate_device_sn)
@@ -137,24 +162,22 @@ event.listen(Device, 'before_insert', Device.generate_device_sn)
 
 # | id | name | address | zip | latitude | longitude | owner_id | (devices) | (tickets) |
 # Site --> Client
-# Site <-- Ticket
 # Site <-- Device
 class Site(db.Model):
 
     __tablename__ = 'site_table'
 
-    id = db.Column(db.String(20), primary_key=True)
-    name = db.Column(db.String(40), nullable=False, unique=True)
-    address = db.Column(db.String(30), nullable=True)
-    zip = db.Column(db.String(20), nullable=True)
-    latitude = db.Column(db.Float, nullable=True)
-    longitude = db.Column(db.Float, nullable=True)
+    id = Column(String(20), primary_key=True)
+    name = Column(String(40), nullable=False, unique=True)
+    address = Column(String(30), nullable=True)
+    zip_code = Column(String(20), nullable=True)
+    country = Column(Enum(Country), nullable=False)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
     # 外键指向一个 Client 实例
-    owner_id = db.Column(db.String(20), db.ForeignKey('client_table.id'), default=None)
+    owner_id = Column(String(20), ForeignKey('client_table.id'), nullable=True)
     # 反向关联 Device
-    devices = db.relationship('Device', backref='site_ref', lazy=True)
-    # 反向关联 Ticket
-    tickets = db.relationship('Ticket', backref='site_ref', lazy=True)
+    devices = relationship('Device', backref='site_ref', lazy=True)
 
     def __repr__(self):
         return f'<Site: {self.name}>'
@@ -162,11 +185,9 @@ class Site(db.Model):
     @staticmethod
     def generate_site_id(mapper, connection, target):
         max_id = db.session.query(db.func.max(Site.id)).scalar()
-        if max_id:
-            new_id_num = int(max_id.split('-')[1]) + 1
-        else:
-            new_id_num = 1
+        new_id_num = int(max_id.split('-')[1]) + 1 if max_id else 1
         target.id = f'SITE-{new_id_num:03d}'
+        return
 
 # 将事件监听器绑定到 Site 类的 before_insert 事件上
 event.listen(Site, 'before_insert', Site.generate_site_id)
@@ -175,34 +196,35 @@ event.listen(Site, 'before_insert', Site.generate_site_id)
 
 # | id | title | title_cn | create_on | type | details | status | first_response | first_response_on |
 # | final_resolution | close_on | (issues) |
-# Ticket --> Site
+# Ticket <-> Device
 # Ticket <-> Issue
 class Ticket(db.Model):
 
     __tablename__ = 'ticket_table'
 
-    id = db.Column(db.String(20), primary_key=True)
-    title = db.Column(db.String(40), nullable=False, unique=True)
-    title_cn = db.Column(db.String(40), nullable=False, unique=True)
-    create_on = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
-    # 外键指向一个 Site 实例
-    site_id = db.Column(db.String(20), db.ForeignKey('site_table.id'), default=None)
-    type = db.Column(Enum(Type), nullable=True)
-    details = db.Column(db.String(80), nullable=False)
-    status = db.Column(Enum(Status), default=Status.open, nullable=False)
-    first_response = db.Column(db.String(80), nullable=True)
-    first_response_on = db.Column(db.DateTime, nullable=True)
-    final_resolution = db.Column(db.String(80), nullable=True)
-    close_on = db.Column(db.DateTime, nullable=True)
+    id = Column(String(20), primary_key=True)
+    title = Column(String(40), nullable=False, unique=True)
+    title_cn = Column(String(40), nullable=False, unique=True)
+    create_on = Column(DateTime, default=lambda: datetime.now(timezone.utc).date())
+    ticket_type = Column(Enum(Type), nullable=True)
+    details = Column(String(80), nullable=False)
+    status = Column(Enum(Status), default=Status.open, nullable=False)
+    first_response = Column(String(80), nullable=True)
+    first_response_on = Column(DateTime, nullable=True)
+    final_resolution = Column(String(80), nullable=True)
+    close_on = Column(DateTime, nullable=True)
     # 与 Issue 的多对多关系
-    issues = db.relationship('Issue', secondary=ticket_issue_association, back_populates='tickets')
+    issues = relationship('Issue', secondary=ticket_issue_association, back_populates='tickets')
+    # 与 Device 的多对多关系
+    devices = relationship('Device', secondary=ticket_device_association, back_populates='tickets')
 
     def __repr__(self):
         return f'<Ticket: {self.title}>'
     
     @staticmethod
     def generate_ticket_id(mapper, connection, target):
-        target.id = generate_random_ticket()
+        target.id = random_ticket_id()
+        return
 
 # 将事件监听器绑定到 Ticket 类的 before_insert 事件上
 event.listen(Ticket, 'before_insert', Ticket.generate_ticket_id)
@@ -215,34 +237,27 @@ class Task(db.Model):
 
     __tablename__ = 'task_table'
 
-    id = db.Column(db.String(20), primary_key=True)
-    execute_on = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
-    action = db.Column(Enum(Action), nullable=True)
-    detail = db.Column(db.String(80), nullable=False)
-    result = db.Column(Enum(Result), nullable=True)
+    id = Column(String(20), primary_key=True)
+    execute_on = Column(DateTime, default=lambda: datetime.now(timezone.utc).date())
+    action = Column(Enum(Action), nullable=True)
+    detail = Column(String(80), nullable=False)
+    result = Column(Enum(Result), nullable=True)
     # 外键指向一个 Ticket 实例
-    ticket_id = db.Column(db.String(20), db.ForeignKey('ticket_table.id'), default=None)
+    ticket_id = Column(String(20), ForeignKey('ticket_table.id'), nullable=True)
 
     def __repr__(self):
         return f'<Resolution: {self.id}>'
     
+    # 根据日期生成ID
     @staticmethod
-    def generate_task_id(mapper, connection, target):
-        execute_date_str = target.execute_on.strftime('%Y%m%d')
-        existing_tasks = db.session.query(Task).filter(
-            db.func.strftime('%Y%m%d', Task.execute_on) == execute_date_str
-        ).all()
-        if existing_tasks:
-            max_id_num = max([int(task.id.split('-')[-1]) for task in existing_tasks])
-            new_id_num = max_id_num + 1
-        else:
-            new_id_num = 1
-        target.id = f'ISSUE-{execute_date_str}-{new_id_num:02d}'
+    def generate_task_id(cls, mapper, connection, target):
+        target.id = date_based_id(cls, target, db.session, prefix='TASK')
+        return
 
 # 绑定事件监听器
 event.listen(Task, 'before_insert', Task.generate_task_id)
 
-    
+
 
 # | id | title | title_cn | report_on | category | details | severity | progress |
 # | final_resolution | close_on | (resolutions) | (tickets) |
@@ -252,36 +267,55 @@ class Issue(db.Model):
 
     __tablename__ = 'issue_table'
 
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(40), nullable=False, unique=True)
-    title_cn = db.Column(db.String(40), nullable=True, unique=True)
-    report_on = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
-    category = db.Column(Enum(Category), nullable=True)
-    details = db.Column(db.String(80), nullable=False)
-    severity = db.Column(Enum(Severity), nullable=True)
-    progress = db.Column(Enum(Progress), default=Progress.analyzing, nullable=False)
-    final_resolution = db.Column(db.String(80), nullable=True)
-    close_on = db.Column(db.DateTime, nullable=True)
+    id = Column(String(20), primary_key=True)
+    title = Column(String(40), nullable=False, unique=True)
+    title_cn = Column(String(40), nullable=True, unique=True)
+    report_on = Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
+    category = Column(Enum(Category), nullable=True)
+    details = Column(String(80), nullable=False)
+    severity = Column(Enum(Severity), nullable=True)
+    progress = Column(Enum(Progress), default=Progress.analyzing, nullable=False)
+    final_resolution = Column(String(80), nullable=True)
+    close_on = Column(DateTime, nullable=True)
     # 反向关联 Resolution，lazy='dynamic' 使得反向关系被访问时返回一个对象而不是列表
-    resolutions = db.relationship('Resolution', backref='issue_ref', lazy=True)
+    resolutions = relationship('Resolution', backref='issue_ref', lazy=True)
     # 与 Ticket 的多对多关系
-    tickets = db.relationship('Ticket', secondary=ticket_issue_association, back_populates='issues')
+    tickets = relationship('Ticket', secondary=ticket_issue_association, back_populates='issues')
 
     def __repr__(self):
         return f'<Issue: {self.title}>'
+    
+    # 根据日期生成ID
+    @staticmethod
+    def generate_issue_id(cls, mapper, connection, target):
+        target.id = date_based_id(cls, target, db.session, prefix='ISSUE')
+        return
+
+# 绑定事件监听器
+event.listen(Issue, 'before_insert', Issue.generate_issue_id)
+
 
 
 # | id | update_on | details | issue_id |
 # Resolution --> Issue
 class Resolution(db.Model):
 
-    __tablename__ = 'user_table'
+    __tablename__ = 'resolution_table'
 
-    id = db.Column(db.Integer, primary_key=True)
-    update_on = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
-    details = db.Column(db.String(80), nullable=False)
+    id = Column(String(20), primary_key=True)
+    update_on = Column(DateTime, default=lambda: datetime.now(timezone.utc).date())
+    details = Column(String(80), nullable=False)
     # 外键指向一个 Issue 实例
-    issue_id = db.Column(db.String(20), db.ForeignKey('issue_table.id'), default=None)
+    issue_id = Column(String(20), ForeignKey('issue_table.id'), nullable=True)
 
     def __repr__(self):
         return f'<Resolution: {self.id}>'
+    
+    # 根据日期生成ID
+    @staticmethod
+    def generate_resolution_id(cls, mapper, connection, target):
+        target.id = date_based_id(cls, target, db.session, prefix='RESUL')
+        return
+
+# 绑定事件监听器
+event.listen(Resolution, 'before_insert', Resolution.generate_resolution_id)

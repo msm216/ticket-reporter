@@ -9,10 +9,12 @@
             "devices": {
                 "A5311042147": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/07/19"
                 },
                 "A7599947201": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/07/19"
                 }
             }
@@ -26,14 +28,17 @@
             "devices": {
                 "A6270534671": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/06/30"
                 },
                 "A6681698345": {
                     "model": "IDC30",
+                    "material": "ACH00037",
                     "install_on": "2024/03/12"
                 },
                 "A4406879911": {
                     "model": "IDC30",
+                    "material": "ACH00037",
                     "install_on": "2024/03/12"
                 }
             }
@@ -47,10 +52,12 @@
             "devices": {
                 "A1799945047": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/07/01"
                 },
                 "A2257440659": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/07/02"
                 }
             }
@@ -64,10 +71,12 @@
             "devices": {
                 "A2511512859": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/06/15"
                 },
                 "A3302553345": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/06/15"
                 }
             }
@@ -83,14 +92,17 @@
             "devices": {
                 "A9077662832": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/06/24"
                 },
                 "A9599952546": {
                     "model": "IDC30",
+                    "material": "ACH00074",
                     "install_on": "2024/03/13"
                 },
                 "A7071437828": {
                     "model": "IDC30",
+                    "material": "ACH00074",
                     "install_on": "2024/03/13"
                 }
             }
@@ -104,10 +116,12 @@
             "devices": {
                 "A5064692765": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/05/31"
                 },
                 "A9638556220": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/05/31"
                 }
             }
@@ -123,10 +137,12 @@
             "devices": {
                 "A4058883018": {
                     "model": "IDC30",
+                    "material": "ACH00037",
                     "install_on": "2024/04/19"
                 },
                 "A3033116319": {
                     "model": "IDC30",
+                    "material": "ACH00037",
                     "install_on": "2024/04/19"
                 }
             }
@@ -142,18 +158,22 @@
             "devices": {
                 "A9542423030": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/07/16"
                 },
                 "A8461739209": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/07/16"
                 },
                 "A5578476944": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/07/16"
                 },
                 "A3163391569": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/07/16"
                 }
             }
@@ -167,10 +187,12 @@
             "devices": {
                 "A1678547887": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/06/05"
                 },
                 "A5509258295": {
                     "model": "IDC180",
+                    "material": "ACH00115",
                     "install_on": "2024/06/05"
                 }
             }
@@ -186,14 +208,17 @@
             "devices": {
                 "A4895250313": {
                     "model": "IDC30",
+                    "material": "ACH00074",
                     "install_on": "2024/05/17"
                 },
                 "A3561773334": {
                     "model": "IDC30",
+                    "material": "ACH00074",
                     "install_on": "2024/05/17"
                 },
                 "A6947570887": {
                     "model": "IDC30",
+                    "material": "ACH00074",
                     "install_on": "2024/05/17"
                 }                
             }

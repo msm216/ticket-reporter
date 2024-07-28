@@ -57,34 +57,39 @@ if __name__ == '__main__':
             )
             client_inst.append(new_client)
             db.session.add(new_client)
-            print(f"New client added: {new_client}")
+            db.session.commit()
+            print(f"New client: {new_client} committed")
             # 创建 Site 实例
             for site_name, details in sites.items():
                 # | id | name | address | zip | latitude | longitude | owner_id | (devices) | (tickets) |
                 new_site = Site(
                     name=site_name,
                     address=details['address'],
-                    zip=details['zip'],
+                    zip_code=details['zip'],
+                    country=details['country'],
                     latitude=details['latitude'],
                     longitude=details['longitude'],
                     owner_id=new_client.id
                 )
                 site_inst.append(new_site)
                 db.session.add(new_site)
-                print(f"New site added: {new_site}")
+                db.session.commit()
+                print(f"New site: {new_site} committed")
                 # 创建 Site 实例
-                for device_sn, info in details['devices']:
+                for device_sn, info in details['devices'].items():
                     # | sn | model | install_on | site_id |
                     new_device = Device(
                         sn=device_sn,
                         model=info['model'],
-                        install_on=datetime.strptime(info['install_on'], '%Y-%m-%d'),
+                        material=info['material'],
+                        install_on=datetime.strptime(info['install_on'], '%Y/%m/%d'),
                         site_id=new_site.id
                     )
                     device_inst.append(new_device)
                     db.session.add(new_device)
-                    print(f"New device added: {new_device}")
-        db.session.commit()
+                    db.session.commit()
+                    print(f"New device: {new_device} committed")
+        
         print(f"Committed:\n{len(client_inst)} clients\n{len(site_inst)} sites\n{len(device_inst)} devices to the database.")
 
 

@@ -101,13 +101,16 @@ if __name__ == '__main__':
                         db.session.rollback()
                         print(f"Error '{e}' occurred while committing {new_device}")
                        
-        print(f"{len(client_inst)} clients\n{len(site_inst)} sites\n{len(device_inst)} devices\n...added to the database")
+        print(f"{len(client_inst)} clients\n \
+                {len(site_inst)} sites\n \
+                {len(device_inst)} devices\n \
+                        ...added to the database")
+        
         #############
         # 5 clients
         # 10 sites
         # 25 devices
         #############
-
 
         # 空列表用于记录创建的实例
         ticket_inst = []
@@ -193,4 +196,40 @@ if __name__ == '__main__':
                 db.session.rollback()
                 print(f"Error '{e}' occurred while committing {new_resolution}")
 
+        print(f"{len(ticket_inst)} tickets\n \
+                {len(task_inst)} tasks\n \
+                {len(issue_inst)} issues\n \
+                {len(resolution_inst)} resolutions\n \
+                            ...added to the database")
+        
+        #############
+        # 10 tickets
+        # 15 tasks
+        # 8 issues
+        # 20 resolutions
+        #############
+
         # 随机创建多对多关系
+        # Ticket <-> Issue
+        for ticket in ticket_inst:
+            related_issues = random.sample(issue_inst, random.randint(1, 2))
+            for issue in related_issues:
+                ticket.issues.append(issue)
+            try:
+                db.session.commit()
+                print(f"Ticket {ticket.id} linked to issues: {[issue.id for issue in related_issues]}")
+            except IntegrityError as e:
+                db.session.rollback()
+                print(f"Error '{e}' occurred while committing ticket-issue relationships")
+
+        # Ticket <-> Device
+        for ticket in ticket_inst:
+            related_devices = random.sample(device_inst, random.randint(1, 3))
+            for device in related_devices:
+                ticket.devices.append(device)
+            try:
+                db.session.commit()
+                print(f"Ticket {ticket.id} linked to devices: {[device.sn for device in related_devices]}")
+            except IntegrityError as e:
+                db.session.rollback()
+                print(f"Error '{e}' occurred while committing ticket-device relationships")

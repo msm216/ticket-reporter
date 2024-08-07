@@ -101,7 +101,7 @@ ticket_issue_association = Table(
 ticket_device_association = Table(
     'ticket_device', db.Model.metadata,
     Column('ticket_id', String(20), ForeignKey('ticket_table.id')),
-    Column('device_sn', String(20), ForeignKey('device_table.sn'))
+    Column('device_id', String(20), ForeignKey('device_table.id'))
 )
 
 
@@ -132,14 +132,14 @@ event.listen(Client, 'before_insert', Client.generate_client_id)
 
 
 
-# | sn | model | install_on | site_id |
+# | id | model | install_on | site_id |
 # Device --> Site
 # Device <-> Ticket
 class Device(db.Model):
 
     __tablename__ = 'device_table'
 
-    sn = Column(String(20), primary_key=True)
+    id = Column(String(20), primary_key=True)
     model = Column(Enum(Model), nullable=False)
     material = Column(String(20), nullable=False)
     install_on = Column(DateTime, default=lambda: datetime.now(timezone.utc).date())
@@ -149,11 +149,11 @@ class Device(db.Model):
     tickets = relationship('Ticket', secondary=ticket_device_association, back_populates='devices')
 
     def __repr__(self):
-        return f'<Site: {self.sn}>'
+        return f'<Site: {self.id}>'
     
     @staticmethod
     def generate_device_sn(mapper, connection, target):
-        target.sn = random_serial_number()
+        target.id = random_serial_number()
         return
 
 # 将事件监听器绑定到 Device 类的 before_insert 事件上
@@ -195,8 +195,8 @@ event.listen(Site, 'before_insert', Site.generate_site_id)
 
 
 
-# | id | title | title_cn | create_on | type | details | status | first_response | first_response_on |
-# | final_resolution | close_on | (issues) |
+# | id | title | title_cn | create_on | ticket_type | description | status |
+# | first_response | first_response_on | final_resolution | close_on |
 # Ticket <-> Device
 # Ticket <-> Issue
 class Ticket(db.Model):
@@ -220,7 +220,7 @@ class Ticket(db.Model):
     devices = relationship('Device', secondary=ticket_device_association, back_populates='tickets')
 
     def __repr__(self):
-        return f'<Ticket: {self.title}>'
+        return f'<Ticket: {self.id}>'
     
     @staticmethod
     def generate_ticket_id(mapper, connection, target):
@@ -232,7 +232,7 @@ event.listen(Ticket, 'before_insert', Ticket.generate_ticket_id)
 
 
 
-# | id | execute_on | action | detail | result | first_response | ticket_id |
+# | id | execute_on | action | description | result | ticket_id |
 # Task --> Ticket
 class Task(db.Model):
 
@@ -260,7 +260,7 @@ event.listen(Task, 'before_insert', Task.generate_task_id)
 
 
 
-# | id | title | title_cn | report_on | category | details | severity | progress |
+# | id | title | title_cn | report_on | category | description | severity | progress |
 # | final_resolution | close_on | (resolutions) | (tickets) |
 # Issue <-- Resolution
 # Issue <-> Ticket

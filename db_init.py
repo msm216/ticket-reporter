@@ -83,10 +83,10 @@ if __name__ == '__main__':
                     print(f"Error '{e}' occurred while committing {new_site}")
                 
                 # 创建 Device 实例
-                for device_sn, info in details['devices'].items():
-                    # | sn | model | install_on | site_id |
+                for device_id, info in details['devices'].items():
+                    # | id | model | install_on | site_id |
                     new_device = Device(
-                        sn=device_sn,
+                        id=device_id,
                         model=info['model'],
                         material=info['material'],
                         install_on=datetime.strptime(info['install_on'], '%Y/%m/%d'),
@@ -101,10 +101,10 @@ if __name__ == '__main__':
                         db.session.rollback()
                         print(f"Error '{e}' occurred while committing {new_device}")
                        
-        print(f"{len(client_inst)} clients\n \
-                {len(site_inst)} sites\n \
-                {len(device_inst)} devices\n \
-                        ...added to the database")
+        print(f"\n{len(client_inst)} clients \
+                \n{len(site_inst)} sites \
+                \n{len(device_inst)} devices \
+                \n...added to the database\n")
         
         #############
         # 5 clients
@@ -196,11 +196,11 @@ if __name__ == '__main__':
                 db.session.rollback()
                 print(f"Error '{e}' occurred while committing {new_resolution}")
 
-        print(f"{len(ticket_inst)} tickets\n \
-                {len(task_inst)} tasks\n \
-                {len(issue_inst)} issues\n \
-                {len(resolution_inst)} resolutions\n \
-                            ...added to the database")
+        print(f"\n{len(ticket_inst)} tickets \
+                \n{len(task_inst)} tasks \
+                \n{len(issue_inst)} issues \
+                \n{len(resolution_inst)} resolutions \
+                \n...added to the database\n")
         
         #############
         # 10 tickets
@@ -229,7 +229,7 @@ if __name__ == '__main__':
                 ticket.devices.append(device)
             try:
                 db.session.commit()
-                print(f"Ticket {ticket.id} linked to devices: {[device.sn for device in related_devices]}")
+                print(f"Ticket {ticket.id} linked to devices: {[device.id for device in related_devices]}")
             except IntegrityError as e:
                 db.session.rollback()
                 print(f"Error '{e}' occurred while committing ticket-device relationships")

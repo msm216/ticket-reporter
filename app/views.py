@@ -8,7 +8,7 @@ from flask import request
 from flask import render_template, flash, redirect, url_for, jsonify
 #from flask import Blueprint
 from werkzeug.utils import secure_filename
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, OperationalError
 
 #from . import db
 from .models import *
@@ -50,8 +50,7 @@ def upload_ticket():
         # 构建文件路径
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
-
-        # 处理文件
+        # 处理文件，parse_dates 参数定义需要被转化为日期的列
         if filename.endswith('.csv'):
             df = pd.read_csv(filepath, parse_dates=['created_on'])
         elif filename.endswith('.xlsx'):

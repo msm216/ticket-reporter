@@ -26,6 +26,17 @@
         <textarea class="form-control" id="ticketDescription" rows="3"></textarea>
     </div>
 </form>
+<form id="uploadForm" action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label class="label">Upload CSV/XLSX File</label>
+        <div class="control">
+            <input class="input" type="file" name="file" accept=".csv, .xlsx" required>
+        </div>
+        <div class="control">
+            <button class="button is-link" type="submit">Upload</button>
+        </div>
+    </div>
+</form>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/ticket.js') }}"></script>

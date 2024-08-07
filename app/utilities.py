@@ -1,5 +1,8 @@
 import os
+import re
+import shutil
 import random
+import enum
 import string
 import subprocess
 
@@ -7,7 +10,7 @@ import pandas as pd
 
 from datetime import datetime, timezone, timedelta
 from werkzeug.utils import secure_filename
-from sqlalchemy import func
+from sqlalchemy import func, inspect
 from sqlalchemy.orm import Session
 
 from . import db
@@ -66,7 +69,7 @@ def random_coordinates() -> tuple[float, float]:
 # random_date(30, 90)  # 过去90天至30天范围内的随机日期
 # random_date(90, origin=datetime(2024, 1, 1))  # 基准日期（2024-01-01）过去90天至范围内的随机日期
 # random_date(30, 90, origin=datetime(2024, 5, 7), direction=False)  # 基准日期（2024-05-07）之后30至90天范围内的随机日期
-def random_date(*args, origin=None, direction=True) -> datetime:
+def random_date(*args, origin=None, direction: bool=True) -> datetime:
     # 随机日期范围
     if len(args) == 1:
         roll_back = args[0]
@@ -87,6 +90,24 @@ def random_date(*args, origin=None, direction=True) -> datetime:
     return some_day
 
 
+# 将模型实例列表转换为 DataFrame
+def model_to_dataframe(model) -> pd.DataFrame:
+    if not issubclass(model, db.Model):
+        raise TypeError("Input should be a subclass of SQLAlchemy db.Model.")
+    instances = model.query.all()
+    data = []
+    for instance in instances:
+        model_dict = {}
+        for c in inspect(instance).mapper.column_attrs:
+            value = getattr(instance, c.key)
+            if isinstance(value, enum.Enum):
+                model_dict[c.key] = value.name
+            else:
+                model_dict[c.key] = value
+        data.append(model_dict)
+    return pd.DataFrame(data)
+
+
 # 确保日期格式为 <class 'datetime.datetime'>
 def date_for_sqlite(meta_date:str) -> datetime:
     if meta_date == '':
@@ -102,7 +123,7 @@ def if_allowed_file(filename:str) -> bool:
 
 
 # 获取git最后提交日期
-def last_commit_time() -> datetime:
+def last_commit_time() -> str:
     try:
         # 获取最后提交的时间戳
         result = subprocess.run(['git', 'log', '-1', '--format=%ct'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -116,21 +137,74 @@ def last_commit_time() -> datetime:
     except Exception as e:
         return f"Error: {e}"
     
-'''
-# 修改 GSP 记录
-def get_gsp_record() -> pd.DataFrame:
-
-
-    gsp_df
-    
-    return gsp_df
-'''
-
-
 
 # 验证文件扩展名
 def allowed_file(filename:str) -> bool:
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'csv', 'xlsx'}
+
+
+# 验证GSP数据文件名
+def valid_filename(filename) -> bool:
+    # 定义正则表达式模式
+    pattern = r"^案例清单列表_\d{14}\.(csv|xlsx)$"
+    # 使用正则表达式进行匹配
+    match = re.match(pattern, filename)
+    return bool(match)
+
+
+### 处理 GSP 数据 ###
+
+# 检查指定目录中文件名符合规则且修改时间最新的csv文件，将其余文件移至arch归档（FINISHED）
+def get_latest_csv(dir: str, pattern: str) -> tuple[str, datetime]:
+    latest_file = None
+    latest_mtime = 0
+    # 创建 arch 文件夹如果不存在
+    gsp_arch_dir = os.path.join(dir, 'arch')
+    os.makedirs(gsp_arch_dir, exist_ok=True)
+    # 遍历目录下的所有文件
+    for filename in os.listdir(dir):
+        # 使用正则表达式匹配文件名
+        match = re.match(pattern, filename)
+        #if filename.endswith(".csv"):
+        if match:
+            #print(f"Compliant csv file {filename} fund.")
+            filepath = os.path.join(dir, filename)
+            mtime = os.path.getmtime(filepath)
+            # 比较修改时间，更新最新的文件和修改时间
+            if mtime > latest_mtime:
+                latest_mtime = mtime
+                latest_file = filename
+        else:
+            #print(f"Not-compliant file {filename} fund.")
+            pass
+    # 如果找到了最新的文件
+    if latest_file:
+        # 获取最新文件的修改时间
+        time_stempel = datetime.fromtimestamp(latest_mtime)
+        print(f"Newest gsp record: {latest_file} exported at {time_stempel}")
+        # 遍历目录下的所有文件，并将非最新的文件移动到 arch 文件夹
+        for filename in os.listdir(dir):
+            match = re.match(pattern, filename)
+            if match and filename != latest_file:
+                old_filepath = os.path.join(dir, filename)
+                new_filepath = os.path.join(gsp_arch_dir, filename)
+                shutil.move(old_filepath, new_filepath)
+                print(f"Moved {filename} to {gsp_arch_dir}")
+    else:
+        print(f"No compliant GSP record fund under: {dir}")
+    return latest_file, time_stempel
+
+
+# 标准化 GSP 记录
+def standardize_gsp(gsp_df:pd.DataFrame) -> pd.DataFrame:
+
+    df = gsp_df
+    
+    # | id | title | title_cn | create_on | ticket_type | description | status |
+    # | first_response | first_response_on | final_resolution | close_on |
+    return df
+
+
 
 
 # 根据上传的数据 DataFrame 更新表格
@@ -153,12 +227,12 @@ def update_tickets_from_dataframe(cls, df:pd.DataFrame):
                 title_cn=row[''], 
                 create_on=row[''],
                 ticket_type=row[''],
-                details=row[''],
+                description=row[''],
                 status=row[''],
                 first_response=row[''],
                 first_response_on=row[''],
                 final_resolution=row[''],
-                close_on=row[''],
+                close_on=row['close_on'],
             )
             print(f"Add new instance: {group}")
             db.session.add(group)

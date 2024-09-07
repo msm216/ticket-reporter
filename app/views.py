@@ -2,10 +2,13 @@ import os
 import pandas as pd
 
 from datetime import datetime, timedelta, timezone
+from io import BytesIO
+from weasyprint import HTML
+
 from flask import Flask
 from flask import current_app as app
 from flask import request
-from flask import render_template, flash, redirect, url_for, jsonify
+from flask import render_template, flash, redirect, url_for, jsonify, send_file
 #from flask import Blueprint
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
@@ -23,8 +26,27 @@ def home():
 
 
 @app.route('/issue')
-def issue():    
-    return render_template('issue.html')
+def issue():
+    issues_all = Issue.query.all()
+    return render_template('issue.html', issues=issues_all)
+
+@app.route('/issue/pdf', methods=['GET'])
+def generate_pdf():
+    issue_id = request.args.get('issue-id')  # POST方法用 request.form.get()
+    if not issue_id:
+        return "No issue selected", 400
+    # 查询选择的 Issue 实例
+    issue = Issue.query.get(issue_id)
+    if not issue:
+        return "Issue not found", 404
+    # 渲染 HTML 模板
+    rendered_html = render_template('issue_report.html', issue=issue)
+    # 生成 PDF
+    pdf_file = BytesIO()
+    HTML(string=rendered_html).write_pdf(pdf_file)
+    pdf_file.seek(0)
+    # 返回 PDF 文件，供预览和下载
+    return send_file(pdf_file, download_name=f'{issue.id}.pdf', as_attachment=False)
 
 
 @app.route('/ticket')

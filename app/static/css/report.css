@@ -1,0 +1,23 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20mm;  /* 设置PDF页面的边距，20mm为合适的边距 */
+}
+h1 {
+    text-align: center;  /* 标题居中 */
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+table, th, td {
+    border: 1px solid black;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+.header {
+    margin-bottom: 20px;
+    text-align: center;
+}

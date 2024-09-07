@@ -1,8 +1,9 @@
 {
     "Lidl": {
-        "Lidl-Elisenstr": {
+        "Lidl-Munich-Elisenstr": {
             "address": "Elisenstraße 3",
             "zip": "80335",
+            "city": "Munich",
             "country": "DE",
             "latitude": 48.0686708,
             "longitude": 9.8155347,
@@ -10,18 +11,21 @@
                 "A5311042147": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/07/19"
+                    "install_on": "2024/07/19",
+                    "cust_id": "Lidl-0001"
                 },
                 "A7599947201": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/07/19"
+                    "install_on": "2024/07/19",
+                    "cust_id": "Lidl-0002"
                 }
             }
         }, 
-        "Lidl-Nymphenburgerstr": {
+        "Lidl-Munich-Nymphenburgerstr": {
             "address": "Nymphenburger Str. 81",
             "zip": "80636",
+            "city": "Munich",
             "country": "DE",
             "latitude": 48.1499866,
             "longitude": 11.5418691,
@@ -29,23 +33,27 @@
                 "A6270534671": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/06/30"
+                    "install_on": "2024/06/30",
+                    "cust_id": "Lidl-0003"
                 },
                 "A6681698345": {
                     "model": "IDC30",
                     "material": "ACH00037",
-                    "install_on": "2024/03/12"
+                    "install_on": "2024/03/12",
+                    "cust_id": "Lidl-0004"
                 },
                 "A4406879911": {
                     "model": "IDC30",
                     "material": "ACH00037",
-                    "install_on": "2024/03/12"
+                    "install_on": "2024/03/12",
+                    "cust_id": "Lidl-0005"
                 }
             }
         },  
-        "Lidl-Schwaighofstr": {
+        "Lidl--Schwaighofstr": {
             "address": "Schwaighofstraße 79",
             "zip": "83684",
+            "city": "",
             "country": "DE",
             "latitude": 47.69565,
             "longitude": 11.484939,
@@ -53,18 +61,21 @@
                 "A1799945047": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/07/01"
+                    "install_on": "2024/07/01",
+                    "cust_id": "Lidl-0006"
                 },
                 "A2257440659": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/07/02"
+                    "install_on": "2024/07/02",
+                    "cust_id": "Lidl-0007"
                 }
             }
         },  
-        "Lidl-Wilmersdorferstr": {
+        "Lidl-Berlin-Wilmersdorferstr": {
             "address": "Wilmersdorfer Str. 126",
             "zip": "10627",
+            "city": "Berlin",
             "country": "DE",
             "latitude": 52.50973,
             "longitude": 13.30583,
@@ -72,20 +83,23 @@
                 "A2511512859": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/06/15"
+                    "install_on": "2024/06/15",
+                    "cust_id": "Lidl-0008"
                 },
                 "A3302553345": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/06/15"
+                    "install_on": "2024/06/15",
+                    "cust_id": "Lidl-0009"
                 }
             }
         }
     },
     "Aldi": {
-        "Aldi-Borsigstr": {
+        "Aldi--Borsigstr": {
             "address": "Borsigstraße 11",
             "zip": "76185",
+            "city": "",
             "country": "DE",
             "latitude": 49.0210975,
             "longitude": 8.2100701,
@@ -93,23 +107,27 @@
                 "A9077662832": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/06/24"
+                    "install_on": "2024/06/24",
+                    "cust_id": ""
                 },
                 "A9599952546": {
                     "model": "IDC30",
                     "material": "ACH00074",
-                    "install_on": "2024/03/13"
+                    "install_on": "2024/03/13",
+                    "cust_id": ""
                 },
                 "A7071437828": {
                     "model": "IDC30",
                     "material": "ACH00074",
-                    "install_on": "2024/03/13"
+                    "install_on": "2024/03/13",
+                    "cust_id": ""
                 }
             }
         },
-        "Aldi-Berolinastr": {
+        "Aldi-Berlin-Berolinastr": {
             "address": "Berolinastraße 7a",
             "zip": "10178",
+            "city": "Berlin",
             "country": "DE",
             "latitude": 52.5207625,
             "longitude": 13.420975,
@@ -117,20 +135,23 @@
                 "A5064692765": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/05/31"
+                    "install_on": "2024/05/31",
+                    "cust_id": ""
                 },
                 "A9638556220": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/05/31"
+                    "install_on": "2024/05/31",
+                    "cust_id": ""
                 }
             }
         }
     },
     "Total": {
-        "Total-Leonrodstr": {
+        "Total-Munich-Leonrodstr": {
             "address": "Leonrodstraße 48",
             "zip": "80636",
+            "city": "Munich",
             "country": "DE",
             "latitude": 48.1570643,
             "longitude": 11.5413242,
@@ -138,20 +159,23 @@
                 "A4058883018": {
                     "model": "IDC30",
                     "material": "ACH00037",
-                    "install_on": "2024/04/19"
+                    "install_on": "2024/04/19",
+                    "cust_id": ""
                 },
                 "A3033116319": {
                     "model": "IDC30",
                     "material": "ACH00037",
-                    "install_on": "2024/04/19"
+                    "install_on": "2024/04/19",
+                    "cust_id": ""
                 }
             }
         }
     },
     "Shell": {
-        "Shell-Ookmeerweg": {
+        "Shell--Ookmeerweg": {
             "address": "Ookmeerweg 501",
             "zip": "1067 MP",
+            "city": "",
             "country": "NL",
             "latitude": 48.0686708,
             "longitude": 9.8155347,
@@ -159,28 +183,33 @@
                 "A9542423030": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/07/16"
+                    "install_on": "2024/07/16",
+                    "cust_id": ""
                 },
                 "A8461739209": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/07/16"
+                    "install_on": "2024/07/16",
+                    "cust_id": ""
                 },
                 "A5578476944": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/07/16"
+                    "install_on": "2024/07/16",
+                    "cust_id": ""
                 },
                 "A3163391569": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/07/16"
+                    "install_on": "2024/07/16",
+                    "cust_id": ""
                 }
             }
         },
-        "Shell-Kaiser-Friedrich-Str": {
+        "Shell-Berlin-Kaiser-Friedrich-Straße": {
             "address": "Kaiser-Friedrich-Straße 95",
             "zip": "10585",
+            "city": "Berlin",
             "country": "DE",
             "latitude": 52.5159335,
             "longitude": 13.2291037,
@@ -188,20 +217,23 @@
                 "A1678547887": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/06/05"
+                    "install_on": "2024/06/05",
+                    "cust_id": ""
                 },
                 "A5509258295": {
                     "model": "IDC180",
                     "material": "ACH00115",
-                    "install_on": "2024/06/05"
+                    "install_on": "2024/06/05",
+                    "cust_id": ""
                 }
             }
         }
     },
     "Tamoil": {
-        "Tamoil-Regulierenring": {
+        "Tamoil--Regulierenring": {
             "address": "Regulierenring 2G",
             "zip": "3981 LB",
+            "city": "",
             "country": "NL",
             "latitude": 52.0639952,
             "longitude": 4.0383803,
@@ -209,17 +241,20 @@
                 "A4895250313": {
                     "model": "IDC30",
                     "material": "ACH00074",
-                    "install_on": "2024/05/17"
+                    "install_on": "2024/05/17",
+                    "cust_id": "Tamoil-0001"
                 },
                 "A3561773334": {
                     "model": "IDC30",
                     "material": "ACH00074",
-                    "install_on": "2024/05/17"
+                    "install_on": "2024/05/17",
+                    "cust_id": "Tamoil-0002"
                 },
                 "A6947570887": {
                     "model": "IDC30",
                     "material": "ACH00074",
-                    "install_on": "2024/05/17"
+                    "install_on": "2024/05/17",
+                    "cust_id": "Tamoil-0003"
                 }                
             }
         }

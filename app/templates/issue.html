@@ -26,6 +26,18 @@
         <input type="date" class="form-control" id="taskDueDate">
     </div>
 </form>
+<form action="/issue/pdf" method="GET" target="_blank">
+    <div class="form-group">
+        <label for="issue-select">Select Issue:</label>
+        <!-- 选择后的数据为 name=value -->
+        <select name="issue-id" id="issue-select" required>
+            {% for issue in issues %}
+                <option value="{{ issue.id }}" title="{{ issue.title }}">{{ issue.id }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button id="print-issue-btn" type="submit" class="btn btn-primary">PRINT ISSUE</button>
+</form>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/issue.js') }}"></script>

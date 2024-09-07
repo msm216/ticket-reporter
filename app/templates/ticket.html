@@ -26,7 +26,7 @@
         <textarea class="form-control" id="ticketDescription" rows="3"></textarea>
     </div>
 </form>
-<form id="uploadForm" action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+<form id="uploadForm" action="{{ url_for('upload_ticket') }}" method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label class="label">Upload CSV/XLSX File</label>
         <div class="control">

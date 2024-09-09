@@ -307,7 +307,7 @@ class Resolution(db.Model):
     update_on = Column(DateTime, default=lambda: datetime.now(timezone.utc).date())
     description = Column(String(80), nullable=False)
     # 外键指向一个 Issue 实例
-    issue_id = Column(String(20), ForeignKey('issue_table.id'), nullable=True)
+    issue_id = Column(String(20), ForeignKey('issue_table.id'), nullable=False)
 
     def __repr__(self):
         return f'<Resolution: {self.id}>'

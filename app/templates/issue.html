@@ -5,9 +5,51 @@
 {% block page_header %}Fixed Issue Header{% endblock %}
 {% block page_subheader %}Welcome to the Issue page.{% endblock %}
 {% block content %}
-<!-- Add task page specific content here -->
+<!-- Add page content specific content here -->
+<div class="accordion" id="issueAccordion">
+    <!-- 循环遍历所有 Issue 实例 -->
+    {% for issue in issues %}
+    <div class="card">
+        <div class="card-header" id="heading{{ issue.id }}">
+            <h2 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ issue.id }}" aria-expanded="false" aria-controls="collapse{{ issue.id }}">
+                    {{ issue.title }} - {{ issue.id }} - {{ issue.progress }}
+                </button>
+            </h2>
+        </div>
+        <div id="collapse{{ issue.id }}" class="collapse" aria-labelledby="heading{{ issue.id }}" data-parent="#issueAccordion">
+            <div class="card-body">
+                <p><strong>ID:</strong> {{ issue.id }}</p>
+                <p><strong>Title (CN):</strong> {{ issue.title_cn or 'N/A' }}</p>
+                <p><strong>Report Date:</strong> {{ issue.report_on }}</p>
+                <p><strong>Category:</strong> {{ issue.category }}</p>
+                <p><strong>Description:</strong> {{ issue.description }}</p>
+                <p><strong>Severity:</strong> {{ issue.severity or 'N/A' }}</p>
+                <p><strong>Progress:</strong> {{ issue.progress }}</p>
+                <p><strong>Final Resolution:</strong> {{ issue.final_resolution or 'N/A' }}</p>
+                <p><strong>Close Date:</strong> {{ issue.close_on or 'N/A' }}</p>
+                <!-- 展示相关的 Resolution 实例 -->
+                <h5>Resolutions</h5>
+                {% if issue.resolutions %}
+                    <ul>
+                    {% for resolution in issue.resolutions %}
+                        <li>
+                            <strong>Update On:</strong> {{ resolution.update_on }} <br>
+                            <strong>Description:</strong> {{ resolution.description }}
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No Resolutions available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}
 {% block control %}
+<!-- Add control panel specific content here -->
 <form>
     <div class="form-group">
         <label for="taskName">Issue Name</label>

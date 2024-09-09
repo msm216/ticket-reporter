@@ -2,7 +2,8 @@ html, body {
     height: 100%;
     margin: 0;
 }
-.navbar-fixed-top {
+/* ***************** NAVIGATION BAR ***************** */
+.navbar-top {
     position: fixed;
     top: 0;
     width: 100%;
@@ -17,8 +18,20 @@ html, body {
     display: flex;
     height: calc(100vh - 70px);
 }
+/* ***************** CONTENT HEADER ***************** */
+.content-header {
+    position: fixed;
+    top: 70px;
+    left: 10px;
+    width: calc(100% - 260px); /* Adjust according to the right-panel width */
+    background-color: white;
+    z-index: 1020;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
 /* ***************** LEFT HALF ***************** */
-.left-panel {
+.left-half {
     flex-grow: 1;
     overflow-y: scroll; /* Always show vertical scrollbar */
     overflow-x: hidden; /* Hide horizontal scrollbar */
@@ -38,11 +51,11 @@ html, body {
     padding: 10px 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-.left-panel p {
+.left-half p {
     word-wrap: break-word; /* Ensure text wraps within the container */
 }
 /* ***************** RIGHT HALF ***************** */
-.right-panel {
+.right-half {
     position: fixed;
     top: 70px;
     right: 0;
@@ -52,5 +65,6 @@ html, body {
     overflow-x: hidden; /* Hide horizontal scrollbar */
     background-color: #f8f9fa;
     padding: 20px;
+    margin: 0px;
     box-shadow: -2px 0 5px rgba(0,0,0,0.1);
 }

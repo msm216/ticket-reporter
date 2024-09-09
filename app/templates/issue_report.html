@@ -11,10 +11,6 @@
     <h1>Issue Report - {{ issue.title }}</h1>
     <table>
         <tr>
-            <th>ID</th>
-            <td>{{ issue.id }}</td>
-        </tr>
-        <tr>
             <th>Title</th>
             <td>{{ issue.title }}</td>
         </tr>
@@ -50,6 +46,23 @@
             <th>Close Date</th>
             <td>{{ issue.close_on if issue.close_on else 'N/A' }}</td>
         </tr>
+    </table>
+    <h2>Resolutions</h2>
+    <table>
+        <tr>
+            <th>Update On</th>
+            <th>Description</th>
+        </tr>
+        {% for resolution in issue.resolutions %}
+        <tr>
+            <td>{{ resolution.update_on }}</td>
+            <td>{{ resolution.description }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="2">No resolutions found for this issue.</td>
+        </tr>
+        {% endfor %}
     </table>
 </body>
 </html>

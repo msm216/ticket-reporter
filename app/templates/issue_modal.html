@@ -1,0 +1,44 @@
+<!-- 模态框样式 -->
+<style>
+    /* 模态框样式 */
+    .modal {
+        display: none; /* 默认不显示 */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
+        padding-top: 120px;
+        padding-bottom: 120px;
+        padding-left: 60px;
+        padding-right: 60px;
+    }
+    /* 添加is-active时显示模态框 */ 
+    .modal.is-active {
+        display: block; 
+    }
+
+    .modal-content {
+        padding: 20px;
+    }
+</style>
+<!-- 模态框结构 -->
+<div id="issueModal" class="modal">
+    <div class="modal-background" onclick="closeModal()"></div>
+    <!-- 防止点击内容关闭模态框 -->
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h2 id="issueModalTitle" class="title"></h2>
+        <input type="hidden" id="issueId">
+        <input type="hidden" id="issueModalMode">
+        <form></form>
+        <div class="control">
+            <button id="issueModalSubmitButton" class="btn btn-primary mt-3" onclick="submitIssue()">Change</button>
+            <button class="btn btn-primary mt-3" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+<!-- 模态框脚本 -->
+<script src="{{ url_for('static', filename='js/modal.js') }}" defer></script>

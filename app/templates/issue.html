@@ -1,52 +1,76 @@
-{% extends "base.html" %}
+{% extends "page_base.html" %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/issue.css') }}">
+<!-- Font Awesome properties fa-chevron-down & fa-chevron-up -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 {% endblock %}
-{% block page_header %}Fixed Issue Header{% endblock %}
+{% block page_header %}Issue Header{% endblock %}
 {% block page_subheader %}Welcome to the Issue page.{% endblock %}
 {% block content %}
 <!-- Add page content specific content here -->
+<!-- 动态渲染Issue内容 -->
 <div class="accordion" id="issueAccordion">
-    <!-- 循环遍历所有 Issue 实例 -->
-    {% for issue in issues %}
-    <div class="card">
-        <div class="card-header" id="heading{{ issue.id }}">
-            <h2 class="mb-0">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ issue.id }}" aria-expanded="false" aria-controls="collapse{{ issue.id }}">
-                    {{ issue.title }} - {{ issue.id }} - {{ issue.progress }}
-                </button>
-            </h2>
-        </div>
-        <div id="collapse{{ issue.id }}" class="collapse" aria-labelledby="heading{{ issue.id }}" data-parent="#issueAccordion">
-            <div class="card-body">
-                <p><strong>ID:</strong> {{ issue.id }}</p>
-                <p><strong>Title (CN):</strong> {{ issue.title_cn or 'N/A' }}</p>
-                <p><strong>Report Date:</strong> {{ issue.report_on }}</p>
-                <p><strong>Category:</strong> {{ issue.category }}</p>
-                <p><strong>Description:</strong> {{ issue.description }}</p>
-                <p><strong>Severity:</strong> {{ issue.severity or 'N/A' }}</p>
-                <p><strong>Progress:</strong> {{ issue.progress }}</p>
-                <p><strong>Final Resolution:</strong> {{ issue.final_resolution or 'N/A' }}</p>
-                <p><strong>Close Date:</strong> {{ issue.close_on or 'N/A' }}</p>
-                <!-- 展示相关的 Resolution 实例 -->
-                <h5>Resolutions</h5>
-                {% if issue.resolutions %}
-                    <ul>
-                    {% for resolution in issue.resolutions %}
-                        <li>
-                            <strong>Update On:</strong> {{ resolution.update_on }} <br>
-                            <strong>Description:</strong> {{ resolution.description }}
-                        </li>
-                    {% endfor %}
-                    </ul>
-                {% else %}
-                    <p>No Resolutions available.</p>
-                {% endif %}
+    {% for group in group_order %}
+    <div class="group-section" id="{{ group }}">
+        <h3>{{ group | capitalize }} Issues</h3>
+        {% if issues_by_group[group] %}
+            <!-- 遍历当前 group 对应的 issues -->
+            {% for issue in issues_by_group[group] %}
+            <div class="card">
+                <div class="card-header d-flex justify-content-between" id="heading{{ issue.id }}">
+                    <span>{{ issue.title }}</span>
+                    <div class="d-flex align-items-center">
+                        <!-- 状态球和状态文字靠右对齐 -->
+                        <span class="progress-indicator {{ issue.progress.name }}"></span>
+                        <span class="ml-2">{{ issue.progress.name }}</span>
+                        <button class="btn btn-link toggle-icon" type="button" data-toggle="collapse" data-target="#collapse{{ issue.id }}" aria-expanded="false" aria-controls="collapse{{ issue.id }}">
+                            <i class="fa fa-chevron-down"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- 展开后的 Issue 细节 -->
+                <div id="collapse{{ issue.id }}" class="collapse" aria-labelledby="heading{{ issue.id }}" data-parent="#issueAccordion">
+                    <div class="card-body">
+                        <p><strong>ID:</strong> {{ issue.id }}</p>
+                        <p><strong>Title (CN):</strong> {{ issue.title_cn or 'N/A' }}</p>
+                        <p><strong>Report Date:</strong> {{ issue.report_on }}</p>
+                        <p><strong>Category:</strong> {{ issue.category.name }}</p>
+                        <p><strong>Description:</strong> {{ issue.description }}</p>
+                        <p><strong>Severity:</strong> {{ issue.severity.name or 'N/A' }}</p>
+                        <p><strong>Progress:</strong> {{ issue.progress.name }}</p>
+                        <p><strong>Final Resolution:</strong> {{ issue.final_resolution or 'N/A' }}</p>
+                        <p><strong>Close Date:</strong> {{ issue.close_on or 'N/A' }}</p>
+                        <!-- 展示相关的 Resolution 实例 -->
+                        <p><strong>Resolutions:</strong></p>
+                        {% if issue.resolutions %}
+                            <ul>
+                            {% for resolution in issue.resolutions %}
+                                <li>
+                                    <strong>Update On:</strong> {{ resolution.update_on }} <br>
+                                    {{ resolution.description }}
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No Resolutions available.</p>
+                        {% endif %}
+                        
+                        <!-- 按钮自动传递当前issue的ID -->
+                        <button id="edit-issue-btn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="openIssueModal('{{ issue.id }}', 'edit')">EDIT</button>
+                        <button id="delete-issue-btn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="deleteIssue('{{ issue.id }}')">DELETE</button>
+                        <button id="print-issue-btn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="window.open('/issue/print/{{ issue.id }}', '_blank')">PRINT</button>
+                    </div>
+                </div>
             </div>
-        </div>
+            {% endfor %}
+        {% else %}
+            <p>No {{ group }} issues available.</p>
+        {% endif %}
     </div>
     {% endfor %}
 </div>
+<!-- 模态框 -->
+{% include 'issue_modal.html' %}
 {% endblock %}
 {% block control %}
 <!-- Add control panel specific content here -->
@@ -67,8 +91,6 @@
         <label for="taskDueDate">Due Date</label>
         <input type="date" class="form-control" id="taskDueDate">
     </div>
-</form>
-<form action="/issue/pdf" method="GET" target="_blank">
     <div class="form-group">
         <label for="issue-select">Select Issue:</label>
         <!-- 选择后的数据为 name=value -->
@@ -78,9 +100,21 @@
             {% endfor %}
         </select>
     </div>
-    <button id="print-issue-btn" type="submit" class="btn btn-primary">PRINT ISSUE</button>
+</form>
+<!-- 选择分类标准的下拉菜单 -->
+<form action="{{ url_for('issue') }}" method="GET">
+    <div class="form-group">
+        <label for="filter-option">Grouping Issues by:</label>
+        <select name="filter-by" class="form-control" id="filter-option" onchange="this.form.submit()">
+            <!-- 默认不分组显示 -->
+            <option value="none" {% if filter_by == 'none' %}selected{% endif %}>None</option>
+            <option value="severity" {% if filter_by == 'severity' %}selected{% endif %}>Severity</option>
+            <option value="category" {% if filter_by == 'category' %}selected{% endif %}>Category</option>
+            <!-- 可以继续扩展其他选项 -->
+        </select>
+    </div>
 </form>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/issue.js') }}"></script>
+<script src="{{ url_for('static', filename='js/issue.js') }}" defer></script>
 {% endblock %}

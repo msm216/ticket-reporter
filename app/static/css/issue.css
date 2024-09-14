@@ -1,3 +1,30 @@
 .card {
     margin-bottom: 5px; /* 调整卡片之间的间距 */
 }
+
+.progress-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+/* 定义不同状态的颜色 */
+.progress-indicator.analyzing {
+    background-color: red;
+}
+.progress-indicator.pending {
+    background-color: orange;;
+}
+.progress-indicator.verify {
+    background-color: lightblue;
+}
+.progress-indicator.closed {
+    background-color: green;
+}
+
+/* 对齐箭头按钮和进度 */
+.toggle-icon {
+    margin-left: 10px;
+}

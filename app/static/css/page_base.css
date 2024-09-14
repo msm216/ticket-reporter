@@ -7,7 +7,7 @@ html, body {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 1030;
+    z-index: 30;
     border-bottom: 2px solid #ddd;
 }
 /* ***************** BELOW NAVIGATION ***************** */
@@ -25,7 +25,7 @@ html, body {
     left: 10px;
     width: calc(100% - 260px); /* Adjust according to the right-panel width */
     background-color: white;
-    z-index: 1020;
+    z-index: 20;
     border-bottom: 1px solid #ddd;
     padding: 10px 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -46,7 +46,7 @@ html, body {
     left: 10px;
     width: calc(100% - 260px); /* Adjust according to the right-panel width */
     background-color: white;
-    z-index: 1020;
+    z-index: 20;
     border-bottom: 1px solid #ddd;
     padding: 10px 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);

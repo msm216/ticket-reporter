@@ -1,13 +1,18 @@
-{% extends "page_base.html" %}
+{% extends "base/page.html" %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/issue.css') }}">
 <!-- Font Awesome properties fa-chevron-down & fa-chevron-up -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 {% endblock %}
-{% block page_header %}Issue Header{% endblock %}
-{% block page_subheader %}Welcome to the Issue page.{% endblock %}
+{% block page_header_text %}Issue Header{% endblock %}
+{% block page_subheader_text %}Welcome to the Issue page.{% endblock %}
+{% block add_button %}
+    <button id="addInstBtn" class="btn btn-primary mt-3" onclick="openModal('', 'add', 'issue')">ADD</button>
+{% endblock %}
 {% block content %}
 <!-- Add page content specific content here -->
+ <!-- 模态框 -->
+{% include 'base/modal.html' %}
 <!-- 动态渲染Issue内容 -->
 <div class="accordion" id="issueAccordion">
     {% for group in group_order %}
@@ -56,9 +61,10 @@
                         {% endif %}
                         
                         <!-- 按钮自动传递当前issue的ID -->
-                        <button id="edit-issue-btn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="openIssueModal('{{ issue.id }}', 'edit')">EDIT</button>
-                        <button id="delete-issue-btn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="deleteIssue('{{ issue.id }}')">DELETE</button>
-                        <button id="print-issue-btn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="window.open('/issue/print/{{ issue.id }}', '_blank')">PRINT</button>
+                        <button id="editInstBtn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="openModal('{{ issue.id }}', 'edit', 'issue')">EDIT</button>
+                        <button id="updateInstBtn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="openModal('{{ issue.id }}', 'update', 'issue')">UPDATE</button>
+                        <button id="deleteInstBtn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="deleteInstance('{{ issue.id }}')">DELETE</button>
+                        <button id="printInstBtn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="window.open('/issue/print/{{ issue.id }}', '_blank')">PRINT</button>
                     </div>
                 </div>
             </div>
@@ -69,8 +75,6 @@
     </div>
     {% endfor %}
 </div>
-<!-- 模态框 -->
-{% include 'issue_modal.html' %}
 {% endblock %}
 {% block control %}
 <!-- Add control panel specific content here -->

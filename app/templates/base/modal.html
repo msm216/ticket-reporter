@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <!-- 模态框基础样式 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base/modal.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- 模态框模块 -->
+    <div id="modalModule" class="modal">
+        <div class="modal-background" onclick="closeModal()"></div>
+        <!-- 防止点击内容关闭模态框 -->
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2 id="modalTitle" class="modal-title">
+                <span id="titleActionSection">Action</span> 
+                <span id="titleObjectSection">Object</span> 
+                <span id="titleIdSection">ID</span>
+            </h2>
+            <input id="instId" type="hidden">
+            <input id="modalMode" type="hidden">
+            <form id="modalForm">
+                {% block modal_form %}{% endblock %}
+            </form>
+            <div id="modalControl" class="modal-control">
+                <button id="modalSubmit" class="btn btn-primary mt-3">Submit</button>
+                <button id="modalCancel" class="btn btn-primary mt-3" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <!-- 模态框基础脚本 -->
+    <script src="{{ url_for('static', filename='js/base/modal.js') }}" defer></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

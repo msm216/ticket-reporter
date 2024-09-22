@@ -1,7 +1,9 @@
+/* 调整卡片之间的间距 */
 .card {
-    margin-bottom: 5px; /* 调整卡片之间的间距 */
+    margin-bottom: 5px;
 }
 
+/* 状态指示灯 */
 .progress-indicator {
     display: inline-block;
     width: 10px;
@@ -24,7 +26,7 @@
     background-color: green;
 }
 
-/* 对齐箭头按钮和进度 */
+/* 对齐箭头按钮 */
 .toggle-icon {
     margin-left: 10px;
 }

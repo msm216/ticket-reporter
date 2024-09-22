@@ -9,9 +9,16 @@
     height: 100%;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
-    padding-top: 60px;
+    padding-top: 120px;
+    padding-bottom: 120px;
+    padding-left: 60px;
+    padding-right: 60px;
 }
 /* 添加is-active时显示模态框 */ 
 .modal.is-active {
     display: block; 
+}
+
+.modal-content {
+    padding: 20px;
 }

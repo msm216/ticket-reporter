@@ -27,8 +27,6 @@ def home():
 
 @app.route('/issue')
 def issue():
-    # 获取用户选择的分类标准，默认是 'none'，即不分组
-    filter_by = request.args.get('filter-by', 'none')
     
     # 获取所有 Issue 实例
     issues_all = Issue.query.all()
@@ -36,10 +34,12 @@ def issue():
     for issue in issues_all:
         issue.resolutions = sorted(issue.resolutions, key=lambda r: r.update_on, reverse=True)
     
+    # 初始化分组信息
     issues_by_group = {}
     group_order = []
-    
-    # 如果用户选择了 'none'，直接展示所有 Issue，不进行分组
+    # 获取用户选择的分类标准，默认不分组
+    filter_by = request.args.get('filter-by', 'none')
+    # 如果选择了 'none'，直接展示所有 Issue
     if filter_by == 'none':
         group_order = ['All']
         issues_by_group = {'All': issues_all}
@@ -62,7 +62,7 @@ def issue():
         issues_by_group = issues_by_severity
         group_order = severity_order  # 预定义好的 severity 顺序
     
-    # 将分组信息和选择传递到模板
+    # 渲染模板
     return render_template('issue.html', 
                            issues=issues_all,
                            issues_by_group=issues_by_group, 

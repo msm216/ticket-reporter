@@ -50,6 +50,13 @@ html, body {
     border-bottom: 1px solid #ddd;
     padding: 10px 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* 使用 Flexbox 将标题文本与按钮分别对齐在左右两边，保证它们在同一水平线上 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.content-header .btn-primary {
+    margin-top: 0; /* 确保按钮不会多余地占用高度 */
 }
 .left-half p {
     word-wrap: break-word; /* Ensure text wraps within the container */

@@ -75,10 +75,11 @@ function confirmAction(message, callback) {
         callback();
     }
 }
+
 // 删除实例
-function deleteInstance(id) {
+function deleteInstance(id, objectType) {
     confirmAction('Are you sure you want to delete this instance?', function() {
-        fetch('/delete/' + id, {
+        fetch(objectType + '/delete/' + id, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -91,4 +92,11 @@ function deleteInstance(id) {
             }
         });
     });
+}
+
+// 打印实例
+function printInstance(id, objectType) {
+    const printUrl = `/${objectType}/print/${id}`;
+    window.open(printUrl, '_blank');
+    console.log('Printing modal...');
 }

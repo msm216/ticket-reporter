@@ -2,8 +2,8 @@
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
 {% endblock %}
-{% block page_header %}Fixed About Header{% endblock %}
-{% block page_subheader %}Welcome to the About page.{% endblock %}
+{% block page_header_text %}Fixed About Header{% endblock %}
+{% block page_subheader_text %}Welcome to the About page.{% endblock %}
 {% block content %}
 <p>Application version: 1.0</p>
 <p>Last update on {{ last_update_date }}</p>

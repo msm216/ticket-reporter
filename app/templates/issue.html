@@ -59,12 +59,11 @@
                         {% else %}
                             <p>No Resolutions available.</p>
                         {% endif %}
-                        
                         <!-- 按钮自动传递当前issue的ID -->
-                        <button id="editInstBtn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="openModal('{{ issue.id }}', 'edit', 'issue')">EDIT</button>
-                        <button id="updateInstBtn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="openModal('{{ issue.id }}', 'update', 'issue')">UPDATE</button>
-                        <button id="deleteInstBtn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="deleteInstance('{{ issue.id }}')">DELETE</button>
-                        <button id="printInstBtn-{{ issue.id }}" class="btn btn-primary mt-3" onclick="window.open('/issue/print/{{ issue.id }}', '_blank')">PRINT</button>
+                        <button class="btn btn-primary mt-3" onclick="openModal('{{ issue.id }}', 'edit', 'issue')">EDIT</button>
+                        <button class="btn btn-primary mt-3" onclick="openModal('{{ issue.id }}', 'update', 'issue')">UPDATE</button>
+                        <button class="btn btn-primary mt-3" onclick="deleteInstance('{{ issue.id }}')">DELETE</button>
+                        <button class="btn btn-primary mt-3" onclick="printInstance('{{ issue.id }}', 'issue')">PRINT</button>
                     </div>
                 </div>
             </div>
@@ -80,22 +79,6 @@
 <!-- Add control panel specific content here -->
 <form>
     <div class="form-group">
-        <label for="taskName">Issue Name</label>
-        <input type="text" class="form-control" id="taskName" placeholder="Enter task name">
-    </div>
-    <div class="form-group">
-        <label for="taskPriority">Priority</label>
-        <select class="form-control" id="taskPriority">
-            <option>Low</option>
-            <option>Medium</option>
-            <option>High</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="taskDueDate">Due Date</label>
-        <input type="date" class="form-control" id="taskDueDate">
-    </div>
-    <div class="form-group">
         <label for="issue-select">Select Issue:</label>
         <!-- 选择后的数据为 name=value -->
         <select name="issue-id" id="issue-select" required>
@@ -105,8 +88,30 @@
         </select>
     </div>
 </form>
-<!-- 选择分类标准的下拉菜单 -->
-<form action="{{ url_for('issue') }}" method="GET">
+<!-- 对实例的筛选项 -->
+<form id="issueControl" action="{{ url_for('issue') }}" method="GET">
+    <div class="form-group">
+        <label for="issueStartDate">Start Date</label>
+        <input type="date" class="form-control" id="issueStartDate" name="start_date"
+               value="{{ request.args.get('start_date', default_start_date) }}">
+    </div>
+    <div class="form-group">
+        <label for="issueEndDate">End Date</label>
+        <input type="date" class="form-control" id="issueEndDate" name="end_date"
+               value="{{ request.args.get('end_date', default_end_date) }}">
+    </div>
+    <!-- 提交按钮 -->
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Apply Filter</button>
+    </div>
+    <!-- 只显示非 Closed 实例 -->
+    <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" id="excludeClosed" name="exclude_closed"
+            {% if request.args.get('exclude_closed') == 'on' %}checked{% endif %}
+            onchange="this.form.submit()">
+        <label class="form-check-label" for="excludeClosed">Exclude Closed Issues</label>
+    </div>
+    <!-- 分组显示实例 -->
     <div class="form-group">
         <label for="filter-option">Grouping Issues by:</label>
         <select name="filter-by" class="form-control" id="filter-option" onchange="this.form.submit()">
@@ -116,6 +121,11 @@
             <option value="category" {% if filter_by == 'category' %}selected{% endif %}>Category</option>
             <!-- 可以继续扩展其他选项 -->
         </select>
+    </div>
+    <!-- 重置按钮：重置筛选，跳转到无参数的 issue 页面 -->
+    <div class="form-group">
+        {% set issue_url = url_for('issue') %}
+        <button type="button" class="btn btn-primary" onclick="resetFilters('{{ issue_url }}')">Reset Filters</button>
     </div>
 </form>
 {% endblock %}

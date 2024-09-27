@@ -1,18 +1,22 @@
 {% extends "base/page.html" %}
+
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/issue.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/issue/page.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/issue/modal.css') }}">
 <!-- Font Awesome properties fa-chevron-down & fa-chevron-up -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 {% endblock %}
+
 {% block page_header_text %}Issue Header{% endblock %}
+
 {% block page_subheader_text %}Welcome to the Issue page.{% endblock %}
+
 {% block add_button %}
-    <button id="addInstBtn" class="btn btn-primary mt-3" onclick="openModal('', 'add', 'issue')">ADD</button>
+<button id="addInstBtn" class="btn btn-primary mt-3" onclick="openModal('', 'add', 'issue')">ADD</button>
 {% endblock %}
+
 {% block content %}
 <!-- Add page content specific content here -->
- <!-- 模态框 -->
-{% include 'base/modal.html' %}
 <!-- 动态渲染Issue内容 -->
 <div class="accordion" id="issueAccordion">
     {% for group in group_order %}
@@ -75,6 +79,9 @@
     {% endfor %}
 </div>
 {% endblock %}
+
+{% block modal %}{% endblock %}
+
 {% block control %}
 <!-- Add control panel specific content here -->
 <form>
@@ -109,12 +116,13 @@
         <input type="checkbox" class="form-check-input" id="excludeClosed" name="exclude_closed"
             {% if request.args.get('exclude_closed') == 'on' %}checked{% endif %}
             onchange="this.form.submit()">
-        <label class="form-check-label" for="excludeClosed">Exclude Closed Issues</label>
+        <label class="form-check-label" for="excludeClosed">Open Issues</label>
     </div>
     <!-- 分组显示实例 -->
     <div class="form-group">
-        <label for="filter-option">Grouping Issues by:</label>
+        <label for="filter-option">Grouping by:</label>
         <select name="filter-by" class="form-control" id="filter-option" onchange="this.form.submit()">
+        <!-- <select name="filter-by" class="form-control" id="filter-option" onchange="$('#issueControl').submit();"> -->
             <!-- 默认不分组显示 -->
             <option value="none" {% if filter_by == 'none' %}selected{% endif %}>None</option>
             <option value="severity" {% if filter_by == 'severity' %}selected{% endif %}>Severity</option>
@@ -129,6 +137,8 @@
     </div>
 </form>
 {% endblock %}
+
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/issue.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/issue/page.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/issue/modal.js') }}" defer></script>
 {% endblock %}

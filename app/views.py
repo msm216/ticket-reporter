@@ -99,6 +99,20 @@ def issue():
                            )
 
 
+@app.route('/load-form', methods=['GET'])
+def load_form():
+    # 获取传递的 mode 参数
+    mode = request.args.get('mode')
+    if mode == 'edit':
+        return render_template('issue/form_edit.html')
+    elif mode == 'update':
+        return render_template('issue/form_update.html')
+    elif mode == 'add':
+        return render_template('issue/form_add.html')
+    else:
+        return "Invalid mode", 400
+
+
 @app.route('/<object_type>/<inst_id>', methods=['GET'])
 def get_instance(inst_id:str, object_type:str):
     object = OBJECTS.get(object_type)
@@ -115,16 +129,20 @@ def get_instance(inst_id:str, object_type:str):
 
 @app.route('/<object_type>/add', methods=['POST'])
 def add_instance(object_type):
-    
-    print(object_type)
-    return
+    print(f"Adding new {object_type}...")
+    return jsonify(success=True)
 
 
 @app.route('/<object_type>/update/<ref_id>', methods=['POST'])
 def update_instance(object_type, ref_id):
-    print(object_type)
-    print(ref_id)
-    return
+    print(f"Updating {object_type}: {ref_id}")
+    return jsonify(success=True)
+
+
+@app.route('/<object_type>/delete/<ref_id>', methods=['DELETE'])
+def delete_instance(object_type, ref_id):
+    print(f"Deleting {object_type}: {ref_id}")
+    return jsonify(success=True)
 
 
 @app.route('/<object_type>/print/<inst_id>', methods=['GET'])

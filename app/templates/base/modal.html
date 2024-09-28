@@ -11,7 +11,7 @@
         <input id="instId" type="hidden">
         <input id="modalMode" type="hidden">
         <form id="modalForm" class="modal-form" method="POST">
-            {% block modal_terms %}{% endblock %}
+            <div id="dynamicTerms"></div>
             <div class="form-group">
                 <button id="modalSubmit" type="submit" class="btn btn-primary mt-3">Submit</button>
             </div>

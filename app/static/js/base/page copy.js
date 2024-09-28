@@ -26,7 +26,6 @@ function capitalizeFirstLetter(string) {
 function openModal(id, mode, objectType) {
     // 获取模态框模块
     const moodalID = `${objectType}${capitalizeFirstLetter(mode)}Modal`;;
-    console.log("Dynamic modal ID: ", moodalID);
     const modalModule = document.getElementById('modalModule');
     
     // 处理标题
@@ -51,22 +50,28 @@ function openModal(id, mode, objectType) {
     var modalForm = modalModule.querySelector('.modal-form');
     modalForm.action = id ? `/${objectType}/${mode}/${id}` : `/${objectType}/${mode}`;
     console.log("Form action URL: ", modalForm.action);
+    
+    // 获取表单内容区域
+    var titleInput = document.getElementById('title');
+    var descriptionInput = document.getElementById('description');
 
     // 根据不同模式获取数据并填充表单
-    fetch(`/load-form?mode=${mode}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text();
-        })
-        .then(data => {
-            // 把获取的内容插入到 dynamic-content div 中
-            document.getElementById('dynamicTerms').innerHTML = data;
-        })
-        .catch(error => {
-            console.error('There was a problem with the fetch operation:', error);
-        });
+    if (mode === 'edit') {
+        // 获取 issue 数据 (假设通过 AJAX 从服务器获取数据)
+        const fetchUrl = `/${objectType}/${id}`;
+        console.log("Fetching: ", fetchUrl);
+        fetch(fetchUrl)
+            .then(response => response.json())
+            .then(data => {
+                //titleInput.value = data.title;
+                //descriptionInput.value = data.description;
+            })
+            .catch(error => console.log(error));
+    } else if (mode === 'update') {
+        // 对于 Resolution 的更新，可能不需要获取现有数据，只需要输入新的描述
+        //titleInput.parentElement.style.display = 'none'; // 隐藏 title 字段
+        //descriptionInput.value = ''; // 清空描述字段，用于新建 Resolution
+    }
 
     // 根据不同的 modalMode 动态赋予不同的函数给 Test 按钮
     if (mode === 'add') {

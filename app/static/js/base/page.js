@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    //
+    // 获取所有卡片对象
     const toggleButtons = document.querySelectorAll('.toggle-icon');
     // 展开收缩卡片
     toggleButtons.forEach(button => {
@@ -47,13 +47,8 @@ function openModal(id, mode, objectType) {
     var modalMode = document.getElementById('modalMode').value;
     console.log("Modal mode: ", modalMode);
 
-    // 动态设置 modalForm 的 action 路径
-    var modalForm = modalModule.querySelector('.modal-form');
-    modalForm.action = id ? `/${objectType}/${mode}/${id}` : `/${objectType}/${mode}`;
-    console.log("Form action URL: ", modalForm.action);
-
     // 根据不同模式获取数据并填充表单
-    fetch(`/load-form?mode=${mode}`)
+    fetch(`/load-form?mode=${mode}&objectType=${objectType}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -61,13 +56,22 @@ function openModal(id, mode, objectType) {
             return response.text();
         })
         .then(data => {
-            // 把获取的内容插入到 dynamic-content div 中
-            document.getElementById('dynamicTerms').innerHTML = data;
+            // 把获取的内容插入到id为 modalForm 的区块中
+            document.getElementById('modalForm').innerHTML = data;
+
+            // 根据不同的 modalMode 动态设置 modalForm 的 action 路径
+            var modalForm = modalModule.querySelector('.modal-form');
+            modalForm.action = id ? `/${objectType}/${id}/${mode}` : `/${objectType}/${mode}`;
+            console.log("Form action URL: ", modalForm.action);
+
+            // 表单加载后显示模态框
+            modalModule.style.display = "block";
+            //modalModule.classList.add('is-active');
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
         });
-
+    
     // 根据不同的 modalMode 动态赋予不同的函数给 Test 按钮
     if (mode === 'add') {
         modalButtton.onclick = addInstance;
@@ -78,9 +82,6 @@ function openModal(id, mode, objectType) {
     } else {
         modalButtton.onclick = null;
     }
-
-    //modalModule.classList.add('is-active'); // 显示模态框
-    modalModule.style.display = "block"; // 显示模态框
 }
 
 // 确认弹窗
@@ -93,7 +94,7 @@ function confirmAction(message, callback) {
 // 删除实例
 function deleteInstance(id, objectType) {
     confirmAction('Are you sure you want to delete this instance?', function() {
-        const deleteUrl = `/${objectType}/delete/${id}`;
+        const deleteUrl = `/${objectType}/${id}/delete`;
         fetch(deleteUrl, {
             method: 'DELETE',
             headers: {
@@ -111,7 +112,7 @@ function deleteInstance(id, objectType) {
 
 // 打印实例
 function printInstance(id, objectType) {
-    const printUrl = `/${objectType}/print/${id}`;
+    const printUrl = `/${objectType}/${id}/print`;
     window.open(printUrl, '_blank');
     console.log('Printing', objectType, id);
 }

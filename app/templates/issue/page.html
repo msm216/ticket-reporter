@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/issue/page.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/issue/modal.css') }}">
 <!-- Font Awesome properties fa-chevron-down & fa-chevron-up -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 {% endblock %}
 
 {% block page_header_text %}Issue Header{% endblock %}
@@ -16,7 +16,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Add page content specific content here -->
 <!-- 动态渲染Issue内容 -->
 <div class="accordion" id="issueAccordion">
     {% for group in group_order %}
@@ -98,7 +97,7 @@
     </div>
 </form>
 <!-- 对实例的筛选项 -->
-<form id="issueControl" action="{{ url_for('issue') }}" method="GET">
+<form id="issueControl" action="{{ url_for('issue_page') }}" method="GET">
     <div class="form-group">
         <label for="issueStartDate">Start Date</label>
         <input type="date" class="form-control" id="issueStartDate" name="start_date"
@@ -134,7 +133,7 @@
     </div>
     <!-- 重置按钮：重置筛选，跳转到无参数的 issue 页面 -->
     <div class="form-group">
-        {% set issue_url = url_for('issue') %}
+        {% set issue_url = url_for('issue_page') %}
         <button type="button" class="btn btn-primary" onclick="resetFilters('{{ issue_url }}')">Reset Filters</button>
     </div>
 </form>

@@ -3,19 +3,16 @@
     <div class="modal-background"></div>
     <!-- 防止点击内容关闭模态框 -->
     <div class="modal-content" onclick="event.stopPropagation()">
-        <h2 id="modalTitle" class="modal-title">
+        <h2 class="modal-title">
             <span id="titleActionSection">Action</span> 
             <span id="titleObjectSection">Object</span> 
             <span id="titleIdSection">ID</span>
         </h2>
         <input id="instId" type="hidden">
         <input id="modalMode" type="hidden">
-        <form id="modalForm" class="modal-form" method="POST">
-            <div id="dynamicTerms"></div>
-            <div class="form-group">
-                <button id="modalSubmit" type="submit" class="btn btn-primary mt-3">Submit</button>
-            </div>
-        </form>
+        <div id="modalForm" class="modal-control">
+            <!-- 动态加载不同的表单 -->
+        </div>
         <div id="modalControl" class="modal-control">
             <button id="modalButton" class="btn btn-primary mt-3">Test</button>
             <button id="modalCancel" class="btn btn-primary mt-3" onclick="closeModal()">Cancel</button>

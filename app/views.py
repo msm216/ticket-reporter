@@ -20,21 +20,108 @@ from .utilities import *
 
 #main = Blueprint('main', __name__)
 
+
 OBJECTS = {
         'issue': Issue,
-        'resol': Resolution,
+        'resolution': Resolution,
         'ticket': Ticket,
         'task': Task
     }
 
+
+REFERENCE = {
+        'issue': 'resolution',
+        'ticket': 'task'
+    }
+
+
+############################################ GENERAL ROUTES ###################################################
 
 @app.route('/')
 def home():    
     return render_template('home.html')
 
 
+@app.route('/load-form', methods=['GET'])
+def load_form():
+    # 获取请求参数 mode 的值
+    mode = request.args.get('mode')
+    object_type = request.args.get('objectType')
+    if mode:
+        return render_template(f'{object_type}/form/{mode}.html')
+    else:
+        return "Invalid mode", 400
+
+
+@app.route('/<object_type>/<inst_id>', methods=['GET'])
+def get_instance(inst_id:str, object_type:str, query:dict):
+    # 根据类名获取类对象
+    object = OBJECTS.get(object_type)
+    # 查询指定 id 的实例
+    instance = object.query.get(inst_id)
+
+    if instance:
+        return jsonify({
+            'title': instance.title,
+            'description': instance.description,
+            # 其他字段
+        })
+    return jsonify({'Error': 'Instance not found'}), 404
+
+
+@app.route('/<object_type>/add', methods=['POST'])
+def add_instance(object_type:str):
+    print(f"Adding new {object_type}...")
+    return jsonify(success=True)
+
+
+@app.route('/<object_type>/<inst_id>/update', methods=['POST'])
+def update_instance(object_type:str, inst_id:str):
+    
+
+    print(f"Updating {object_type}: {inst_id}")
+
+
+    return jsonify(success=True)
+
+
+@app.route('/<object_type>/<inst_id>/delete', methods=['DELETE'])
+def delete_instance(object_type, ref_id):
+    print(f"Deleting {object_type}: {ref_id}")
+    return jsonify(success=True)
+
+
+@app.route('/<object_type>/<inst_id>/print', methods=['GET'])
+def generate_pdf(inst_id:str, object_type:str):
+    # 判断是否给定 id
+    if not inst_id:
+        return "No issue selected", 400
+    # 获取模型类
+    object = OBJECTS.get(object_type)
+    # 查询选择的 Issue 实例
+    instance = object.query.get(inst_id)
+    #issue_id = request.args.get('inst_id')  # POST方法用 request.form.get()
+    if not instance:
+        return "Issue not found", 404
+     # 渲染 HTML 模板，将 issue 实例传递给模板
+    rendered_html = render_template(f'report/{object_type}.html', instance=instance)
+    # 创建 BytesIO 对象，用于保存生成的 PDF 文件
+    pdf_file = BytesIO()
+    # 使用 WeasyPrint 将 HTML 转换为 PDF
+    HTML(string=rendered_html).write_pdf(pdf_file)
+    # 将文件指针移到文件的开始位置
+    pdf_file.seek(0)
+    # 返回 PDF 文件，供预览和下载
+    return send_file(pdf_file, 
+                     download_name=f'{instance.id}.pdf', 
+                     as_attachment=False, 
+                     mimetype='application/pdf')
+
+
+############################################ ISSUE SPECIFIC ROUTES ############################################
+
 @app.route('/issue')
-def issue():
+def issue_page():
     
     theme = 'issue'
     print(f"Theme of the page: '{theme}'.\n")
@@ -99,79 +186,23 @@ def issue():
                            )
 
 
-@app.route('/load-form', methods=['GET'])
-def load_form():
-    # 获取传递的 mode 参数
-    mode = request.args.get('mode')
-    if mode == 'edit':
-        return render_template('issue/form_edit.html')
-    elif mode == 'update':
-        return render_template('issue/form_update.html')
-    elif mode == 'add':
-        return render_template('issue/form_add.html')
-    else:
-        return "Invalid mode", 400
 
-
-@app.route('/<object_type>/<inst_id>', methods=['GET'])
-def get_instance(inst_id:str, object_type:str):
-    object = OBJECTS.get(object_type)
-
-    instance = object.query.get(inst_id)
-    if instance:
-        return jsonify({
-            'title': instance.title,
-            'description': instance.description,
-            # 其他字段
-        })
-    return jsonify({'Error': 'Instance not found'}), 404
-
-
-@app.route('/<object_type>/add', methods=['POST'])
-def add_instance(object_type):
-    print(f"Adding new {object_type}...")
-    return jsonify(success=True)
-
-
-@app.route('/<object_type>/update/<ref_id>', methods=['POST'])
-def update_instance(object_type, ref_id):
-    print(f"Updating {object_type}: {ref_id}")
-    return jsonify(success=True)
-
-
-@app.route('/<object_type>/delete/<ref_id>', methods=['DELETE'])
-def delete_instance(object_type, ref_id):
-    print(f"Deleting {object_type}: {ref_id}")
-    return jsonify(success=True)
-
-
-@app.route('/<object_type>/print/<inst_id>', methods=['GET'])
-def generate_pdf(inst_id, object_type):
-    #issue_id = request.args.get('inst_id')  # POST方法用 request.form.get()
-    if not inst_id:
-        return "No issue selected", 400
-    # 查询选择的 Issue 实例
-    instance = Issue.query.get(inst_id)
-    if not instance:
-        return "Issue not found", 404
-     # 渲染 HTML 模板，将 issue 实例传递给模板
-    rendered_html = render_template(f'report/{object_type}.html', instance=instance)
-    # 创建 BytesIO 对象，用于保存生成的 PDF 文件
-    pdf_file = BytesIO()
-    # 使用 WeasyPrint 将 HTML 转换为 PDF
-    HTML(string=rendered_html).write_pdf(pdf_file)
-    # 将文件指针移到文件的开始位置
-    pdf_file.seek(0)
-    # 返回 PDF 文件，供预览和下载
-    return send_file(pdf_file, 
-                     download_name=f'{instance.id}.pdf', 
-                     as_attachment=False, 
-                     mimetype='application/pdf')
-
+############################################ TICKET SPECIFIC ROUTES ###########################################
 
 @app.route('/ticket')
-def ticket():
-    return render_template('ticket/page.html'
+def ticket_page():
+
+    theme = 'ticket'
+    print(f"Theme of the page: '{theme}'.\n")
+
+    # 获取所有 Issue 实例
+    tickets_all = Ticket.query.all()
+    # 对每个 issue 的 resolutions 按照 update_on 进行降序排序
+    for ticket in tickets_all:
+        ticket.resolutions = sorted(ticket.resolutions, key=lambda r: r.update_on, reverse=True)
+
+    return render_template('ticket/page.html',
+                           tickets=tickets_all
                            )
 
 
@@ -215,7 +246,17 @@ def upload_ticket():
     return redirect(request.url)
 
 
+############################################ SERVICE SPECIFIC ROUTES ##########################################
+
+@app.route('/service')
+def service_page():
+    return render_template('service/page.html'
+                           )
+
+
+############################################ ABOUT SPECIFIC ROUTES ############################################
+
 @app.route('/about')
-def about():
+def about_page():
     return render_template('about.html',
                            last_update_date=last_commit_time())

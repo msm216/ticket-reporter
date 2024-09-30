@@ -1,12 +1,17 @@
 {% extends "base/page.html" %}
+
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/ticket.css') }}">
 {% endblock %}
+
 {% block page_header_text %}Fixed Ticket Header{% endblock %}
+
 {% block page_subheader_text %}Welcome to the Ticket page.{% endblock %}
+
 {% block content %}
 <!-- Add ticket page specific content here -->
 {% endblock %}
+
 {% block control %}
 <form>
     <div class="form-group">
@@ -50,6 +55,7 @@
     </div>
 </form>
 {% endblock %}
+
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/ticket.js') }}"></script>
 {% endblock %}

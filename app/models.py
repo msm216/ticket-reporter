@@ -197,6 +197,7 @@ event.listen(Site, 'before_insert', Site.generate_site_id)
 
 # | id | title | title_cn | create_on | ticket_type | description | status |
 # | first_response | first_response_on | final_resolution | close_on |
+# Ticket <-- Task
 # Ticket <-> Device
 # Ticket <-> Issue
 class Ticket(db.Model):
@@ -214,6 +215,8 @@ class Ticket(db.Model):
     first_response_on = Column(DateTime, nullable=True)
     final_resolution = Column(String(80), nullable=True)
     close_on = Column(DateTime, nullable=True)
+    # 反向关联 Task，lazy='dynamic' 使得反向关系被访问时返回一个对象而不是列表
+    tasks = relationship('Task', backref='ticket_ref', lazy=True)
     # 与 Issue 的多对多关系
     issues = relationship('Issue', secondary=ticket_issue_association, back_populates='tickets')
     # 与 Device 的多对多关系
@@ -244,7 +247,7 @@ class Task(db.Model):
     description = Column(String(80), nullable=False)
     result = Column(Enum(Result), default=Result.pending, nullable=False)
     # 外键指向一个 Ticket 实例
-    ticket_id = Column(String(20), ForeignKey('ticket_table.id'), nullable=True)
+    ticket_id = Column(String(20), ForeignKey('ticket_table.id'), nullable=False)
 
     def __repr__(self):
         return f'<Resolution: {self.id}>'

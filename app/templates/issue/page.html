@@ -100,13 +100,13 @@
 <form id="issueControl" action="{{ url_for('issue_page') }}" method="GET">
     <div class="form-group">
         <label for="issueStartDate">Start Date</label>
-        <input type="date" class="form-control" id="issueStartDate" name="start_date"
-               value="{{ request.args.get('start_date', default_start_date) }}">
+        <input type="date" class="form-control" id="issueStartDate" name="startDate"
+               value="{{ request.args.get('startDate', default_start_date) }}">
     </div>
     <div class="form-group">
         <label for="issueEndDate">End Date</label>
-        <input type="date" class="form-control" id="issueEndDate" name="end_date"
-               value="{{ request.args.get('end_date', default_end_date) }}">
+        <input type="date" class="form-control" id="issueEndDate" name="endDate"
+               value="{{ request.args.get('endDate', default_end_date) }}">
     </div>
     <!-- 提交按钮 -->
     <div class="form-group">
@@ -114,8 +114,8 @@
     </div>
     <!-- 只显示非 Closed 实例 -->
     <div class="form-group form-check">
-        <input type="checkbox" class="form-check-input" id="excludeClosed" name="exclude_closed"
-            {% if request.args.get('exclude_closed') == 'on' %}checked{% endif %}
+        <input type="checkbox" class="form-check-input" id="excludeClosed" name="excludeClosed"
+            {% if request.args.get('excludeClosed') == 'on' %}checked{% endif %}
             onchange="this.form.submit()">
         <label class="form-check-label" for="excludeClosed">Open Issues</label>
     </div>

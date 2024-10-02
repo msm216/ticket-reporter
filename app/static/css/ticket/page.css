@@ -1,0 +1,29 @@
+/* 调整卡片之间的间距 */
+.card {
+    margin-bottom: 5px;
+}
+
+/* 状态指示灯 */
+.status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+/* 定义不同状态的颜色 */
+.status-indicator.open {
+    background-color: red;
+}
+.status-indicator.processing {
+    background-color: orange;;
+}
+.status-indicator.closed {
+    background-color: green;
+}
+
+/* 对齐箭头按钮 */
+.toggle-icon {
+    margin-left: 10px;
+}

@@ -1,15 +1,79 @@
 {% extends "base/page.html" %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/ticket.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ticket/page.css') }}">
+<!-- Font Awesome properties fa-chevron-down & fa-chevron-up -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 {% endblock %}
 
 {% block page_header_text %}Fixed Ticket Header{% endblock %}
 
 {% block page_subheader_text %}Welcome to the Ticket page.{% endblock %}
 
+{% block add_button %}
+<button id="addInstBtn" class="btn btn-primary mt-3" onclick="openModal('', 'add', 'ticket')">ADD</button>
+{% endblock %}
+
 {% block content %}
-<!-- Add ticket page specific content here -->
+<div class="accordion" id="ticketAccordion">
+    {% for group in group_order %}
+    <div class="group-section" id="{{ group }}">
+        <h3>{{ group | capitalize }} Tickets</h3>
+        {% if tickets_by_group[group] %}
+            <!-- 遍历当前 group 对应的 tickets -->
+            {% for ticket in tickets_by_group[group] %}
+            <div class="card">
+                <div class="card-header d-flex justify-content-between" id="heading{{ ticket.id }}">
+                    <span>{{ ticket.title }}</span>
+                    <div class="d-flex align-items-center">
+                        <!-- 状态球和状态文字靠右对齐 -->
+                        <span class="status-indicator {{ ticket.status.name }}"></span>
+                        <span class="ml-2">{{ ticket.status.name }}</span>
+                        <button class="btn btn-link toggle-icon" type="button" data-toggle="collapse" data-target="#collapse{{ ticket.id }}" aria-expanded="false" aria-controls="collapse{{ ticket.id }}">
+                            <i class="fa fa-chevron-down"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- 展开后的 Ticket 细节 -->
+                <div id="collapse{{ ticket.id }}" class="collapse" aria-labelledby="heading{{ ticket.id }}" data-parent="#ticketAccordion">
+                    <div class="card-body">
+                        <p><strong>ID:</strong> {{ ticket.id }}</p>
+                        <p><strong>Title (CN):</strong> {{ ticket.title_cn or 'N/A' }}</p>
+                        <p><strong>Report Date:</strong> {{ ticket.create_on }}</p>
+                        <p><strong>Type:</strong> {{ ticket.ticket_type.name }}</p>
+                        <p><strong>Description:</strong> {{ ticket.description }}</p>
+                        <p><strong>Status:</strong> {{ ticket.status.name }}</p>
+                        <p><strong>Final Resolution:</strong> {{ ticket.final_resolution or 'N/A' }}</p>
+                        <p><strong>Close Date:</strong> {{ ticket.close_on or 'N/A' }}</p>
+                        <!-- 展示相关的 Resolution 实例 -->
+                        <p><strong>Tasks:</strong></p>
+                        {% if ticket.tasks %}
+                            <ul>
+                            {% for task in ticket.tasks %}
+                                <li>
+                                    <strong>Update On:</strong> {{ task.execute_on }} <br>
+                                    {{ task.description }}
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No Tasks available.</p>
+                        {% endif %}
+                        <!-- 按钮自动传递当前issue的ID -->
+                        <button class="btn btn-primary mt-3" onclick="openModal('{{ ticket.id }}', 'edit', 'ticket')">EDIT</button>
+                        <button class="btn btn-primary mt-3" onclick="openModal('{{ ticket.id }}', 'update', 'ticket')">UPDATE</button>
+                        <button class="btn btn-primary mt-3" onclick="deleteInstance('{{ ticket.id }}')">DELETE</button>
+                        <button class="btn btn-primary mt-3" onclick="printInstance('{{ ticket.id }}', 'ticket')">PRINT</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No {{ group }} tasks available.</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}
 
 {% block control %}
@@ -50,12 +114,12 @@
             <input class="input" type="file" name="file" accept=".csv, .xlsx" required>
         </div>
         <div class="control">
-            <button class="button is-link" type="submit">Upload</button>
+            <button class="btn btn-primary mt-3" type="submit">Upload</button>
         </div>
     </div>
 </form>
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/ticket.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ticket/page.js') }}"></script>
 {% endblock %}

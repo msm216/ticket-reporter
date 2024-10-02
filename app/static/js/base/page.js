@@ -48,7 +48,7 @@ function openModal(id, mode, objectType) {
     console.log("Modal mode: ", modalMode);
 
     // 根据不同模式获取数据并填充表单
-    fetch(`/load-form?mode=${mode}&objectType=${objectType}`)
+    fetch(`/load-form?mode=${encodeURIComponent(mode)}&objectType=${encodeURIComponent(objectType)}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -122,17 +122,4 @@ function printTheme(objectType) {
     const printUrl = `/${objectType}/print/`;
     window.open(printUrl, '_blank');
     console.log('Printing', objectType);
-}
-
-// 重置筛选条件并重新加载页面
-function resetFilters(resetUrl) {
-    // 获取表单元素
-    // 设置默认日期和其他参数
-    const defaultStartDate = '2022-01-01';
-    const defaultFilterBy = 'none';
-    // 构建重置后的 URL
-    const resetParams = `?start_date=${defaultStartDate}&filter-by=${defaultFilterBy}`;
-    // 使用从模板中传递的 resetUrl 来重定向
-    window.location.href = resetUrl + resetParams;
-    console.log('Reset filter...');
 }

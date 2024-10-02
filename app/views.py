@@ -48,6 +48,7 @@ def load_form():
     mode = request.args.get('mode')
     object_type = request.args.get('objectType')
     if mode:
+        # issue/form/add.html
         return render_template(f'{object_type}/form/{mode}.html')
     else:
         return "Invalid mode", 400
@@ -90,7 +91,7 @@ def delete_instance(object_type, ref_id):
     print(f"Deleting {object_type}: {ref_id}")
     return jsonify(success=True)
 
-
+# 打印指定实例的 PDF 报告
 @app.route('/<object_type>/<inst_id>/print', methods=['GET'])
 def generate_pdf(inst_id:str, object_type:str):
     # 判断是否给定 id
@@ -133,9 +134,9 @@ def issue_page():
         issue.resolutions = sorted(issue.resolutions, key=lambda r: r.update_on, reverse=True)
     
     ######## 筛选实例 ########
-    start_date_str = request.args.get('start_date', '2022-01-01')
-    end_date_str = request.args.get('end_date', datetime.now().strftime('%Y-%m-%d'))
-    exclude_closed = request.args.get('exclude_closed', False)
+    start_date_str = request.args.get('startDate', '2024-01-01')
+    end_date_str = request.args.get('endDate', datetime.now().strftime('%Y-%m-%d'))
+    exclude_closed = request.args.get('excludeClosed', False)
     # 将日期字符串转换为日期对象
     start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
     end_date = datetime.strptime(end_date_str, '%Y-%m-%d') + timedelta(days=1)
@@ -153,7 +154,7 @@ def issue_page():
     issues_by_group = {'All': issues_filtered}
     group_order = ['All']
     # 获取用户选择的分类标准，默认不分组
-    filter_by = request.args.get('filter-by', 'none')
+    filter_by = request.args.get('filterBy', 'none')
     if filter_by == 'none':
         group_order = ['All']
         issues_by_group = {'All': issues_filtered}
@@ -199,10 +200,23 @@ def ticket_page():
     tickets_all = Ticket.query.all()
     # 对每个 issue 的 resolutions 按照 update_on 进行降序排序
     for ticket in tickets_all:
-        ticket.resolutions = sorted(ticket.resolutions, key=lambda r: r.update_on, reverse=True)
+        ticket.tasks = sorted(ticket.tasks, key=lambda r: r.execute_on, reverse=True)
+
+    tickets_filtered = tickets_all
+
+    ######## 分组显示实例 ########
+    tickets_by_group = {'All': tickets_filtered}
+    group_order = ['All']
+    # 获取用户选择的分类标准，默认不分组
+    #filter_by = request.args.get('filterBy', 'none')
+    filter_by = 'none'
+    #############################
 
     return render_template('ticket/page.html',
-                           tickets=tickets_all
+                           tickets=tickets_all,
+                           tickets_by_group=tickets_by_group, 
+                           group_order=group_order,
+                           filter_by=filter_by,
                            )
 
 

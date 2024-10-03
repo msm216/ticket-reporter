@@ -37,7 +37,8 @@
                     </div>
                 </div>
                 <!-- 展开后的 Issue 细节 -->
-                <div id="collapse{{ issue.id }}" class="collapse" aria-labelledby="heading{{ issue.id }}" data-parent="#issueAccordion">
+                <div id="collapse{{ issue.id }}" class="collapse {% if issue.id==expanded_issue_id %}show{% endif %}" 
+                    aria-labelledby="heading{{ issue.id }}" data-parent="#issueAccordion">
                     <div class="card-body">
                         <p><strong>ID:</strong> {{ issue.id }}</p>
                         <p><strong>Title (CN):</strong> {{ issue.title_cn or 'N/A' }}</p>
@@ -84,20 +85,23 @@
 {% endblock %}
 
 {% block control %}
-<!-- Add control panel specific content here -->
-<form>
+<!-- 对实例的筛选项 -->
+<form id="issueControl" action="{{ url_for('issue_page') }}" method="GET">
     <div class="form-group">
-        <label for="issue-select">Select Issue:</label>
-        <!-- 选择后的数据为 name=value -->
-        <select name="issue-id" id="issue-select" required>
+        <label for="issue-select">Select Issue</label>
+        <!-- 路由根据 name 参数获得值 -->
+        <select name="issueId" id="issue-select" required onchange="this.form.submit()">
+            <!-- 添加 'All' 选项，默认选中 -->
+            <option value="all" title="Show all issues"
+                {% if request.args.get('issueId', 'all') == 'all' %}selected{% endif %}>All</option>
             {% for issue in issues %}
-                <option value="{{ issue.id }}" title="{{ issue.title }}">{{ issue.id }}</option>
+                <option value="{{ issue.id }}" title="{{ issue.title }}" 
+                        {% if request.args.get('issueId') == issue.id %}selected{% endif %}>
+                    {{ issue.id }}
+                </option>
             {% endfor %}
         </select>
     </div>
-</form>
-<!-- 对实例的筛选项 -->
-<form id="issueControl" action="{{ url_for('issue_page') }}" method="GET">
     <div class="form-group">
         <label for="issueStartDate">Start Date</label>
         <input type="date" class="form-control" id="issueStartDate" name="startDate"
@@ -114,16 +118,15 @@
     </div>
     <!-- 只显示非 Closed 实例 -->
     <div class="form-group form-check">
-        <input type="checkbox" class="form-check-input" id="excludeClosed" name="excludeClosed"
+        <input type="checkbox" class="form-check-input" id="exclude-closed" name="excludeClosed"
             {% if request.args.get('excludeClosed') == 'on' %}checked{% endif %}
             onchange="this.form.submit()">
-        <label class="form-check-label" for="excludeClosed">Open Issues</label>
+        <label class="form-check-label" for="exclude-closed">Open Issues</label>
     </div>
     <!-- 分组显示实例 -->
     <div class="form-group">
         <label for="filter-option">Grouping by:</label>
-        <select name="filter-by" class="form-control" id="filter-option" onchange="this.form.submit()">
-        <!-- <select name="filter-by" class="form-control" id="filter-option" onchange="$('#issueControl').submit();"> -->
+        <select name="filterBy" class="form-control" id="filter-option" onchange="this.form.submit()">
             <!-- 默认不分组显示 -->
             <option value="none" {% if filter_by == 'none' %}selected{% endif %}>None</option>
             <option value="severity" {% if filter_by == 'severity' %}selected{% endif %}>Severity</option>

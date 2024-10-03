@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 {% endblock %}
 
-{% block page_header_text %}Fixed Ticket Header{% endblock %}
+{% block page_header_text %}Ticket Header{% endblock %}
 
 {% block page_subheader_text %}Welcome to the Ticket page.{% endblock %}
 
@@ -74,6 +74,10 @@
     </div>
     {% endfor %}
 </div>
+{% endblock %}
+
+{% block modal %}
+{% include 'base/modal.html' %}
 {% endblock %}
 
 {% block control %}

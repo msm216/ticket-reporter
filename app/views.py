@@ -47,6 +47,7 @@ def load_form():
     # 获取请求参数 mode 的值
     mode = request.args.get('mode')
     object_type = request.args.get('objectType')
+    print(f"Loading form '{mode}' for page '{object_type}'...")
     if mode:
         # issue/form/add.html
         return render_template(f'{object_type}/form/{mode}.html')
@@ -73,15 +74,13 @@ def get_instance(inst_id:str, object_type:str, query:dict):
 @app.route('/<object_type>/add', methods=['POST'])
 def add_instance(object_type:str):
     print(f"Adding new {object_type}...")
+
     return jsonify(success=True)
 
 
 @app.route('/<object_type>/<inst_id>/update', methods=['POST'])
 def update_instance(object_type:str, inst_id:str):
-    
-
     print(f"Updating {object_type}: {inst_id}")
-
 
     return jsonify(success=True)
 
@@ -89,6 +88,7 @@ def update_instance(object_type:str, inst_id:str):
 @app.route('/<object_type>/<inst_id>/delete', methods=['DELETE'])
 def delete_instance(object_type, ref_id):
     print(f"Deleting {object_type}: {ref_id}")
+
     return jsonify(success=True)
 
 # 打印指定实例的 PDF 报告
@@ -125,7 +125,7 @@ def generate_pdf(inst_id:str, object_type:str):
 def issue_page():
     
     theme = 'issue'
-    print(f"Theme of the page: '{theme}'.\n")
+    print(f"\nTheme of the page: '{theme}'.")
 
     # 获取所有 Issue 实例
     issues_all = Issue.query.all()
@@ -133,49 +133,61 @@ def issue_page():
     for issue in issues_all:
         issue.resolutions = sorted(issue.resolutions, key=lambda r: r.update_on, reverse=True)
     
-    ######## 筛选实例 ########
-    start_date_str = request.args.get('startDate', '2024-01-01')
-    end_date_str = request.args.get('endDate', datetime.now().strftime('%Y-%m-%d'))
-    exclude_closed = request.args.get('excludeClosed', False)
-    # 将日期字符串转换为日期对象
-    start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-    end_date = datetime.strptime(end_date_str, '%Y-%m-%d') + timedelta(days=1)
-    # 根据日期过滤 issues
-    print(f"Selecting {theme}: preported from {start_date} to {end_date}.\n")
-    issues_filtered = [issue for issue in issues_all if end_date >= issue.report_on >= start_date]
-    # 如果选中排除关闭状态，过滤掉状态为 "closed" 的 Issue
-    if exclude_closed:
-        issues_filtered = [issue for issue in issues_filtered if issue.progress.name.lower() != 'closed']
+    ######## 处理实例选择 ########
+    selected_issue_id = request.args.get('issueId', 'all')
+
+    if selected_issue_id == 'all':
+        # 如果未选择特定实例，则应用其他筛选条件
+        start_date_str = request.args.get('startDate', '2024-01-01')
+        end_date_str = request.args.get('endDate', datetime.now().strftime('%Y-%m-%d'))
+        exclude_closed = request.args.get('excludeClosed', False)
+        # 将日期字符串转换为日期对象
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d') + timedelta(days=1)
+        # 根据日期过滤 issues
+        print(f"Selecting {theme}: preported from {start_date} to {end_date}.\n")
+        issues_filtered = [issue for issue in issues_all if end_date >= issue.report_on >= start_date]
+        # 如果选中排除关闭状态，过滤掉状态为 "closed" 的 Issue
+        if exclude_closed:
+            issues_filtered = [issue for issue in issues_filtered if issue.progress.name.lower() != 'closed']
+        else:
+            pass
+        ######## 处理分组显示实例 ########
+        # 获取用户选择的分类标准，默认不分组
+        filter_by = request.args.get('filterBy', 'none')
+        if filter_by == 'none':
+            issues_by_group = {'All': issues_filtered}
+            group_order = ['All']
+        elif filter_by == 'category':
+            categories = set([issue.category.name for issue in issues_filtered])
+            issues_by_category = {category: [] for category in categories}
+            for issue in issues_filtered:
+                issues_by_category[issue.category.name].append(issue)
+            issues_by_group = issues_by_category
+            group_order = sorted(categories)  # 排序后的分类顺序
+        elif filter_by == 'severity':
+            severity_order = ['vital', 'critical', 'grave', 'normal', 'minor']
+            issues_by_severity = {severity: [] for severity in severity_order}
+            for issue in issues_filtered:
+                severity_name = issue.severity.name
+                if severity_name in issues_by_severity:
+                    issues_by_severity[severity_name].append(issue)
+            issues_by_group = issues_by_severity
+            group_order = severity_order
+        ###################################
+        expanded_issue_id = None
     else:
-        pass
-    #########################
-
-    ######## 分组显示实例 ########
-    issues_by_group = {'All': issues_filtered}
-    group_order = ['All']
-    # 获取用户选择的分类标准，默认不分组
-    filter_by = request.args.get('filterBy', 'none')
-    if filter_by == 'none':
-        group_order = ['All']
-        issues_by_group = {'All': issues_filtered}
-    elif filter_by == 'category':
-        categories = set([issue.category.name for issue in issues_filtered])
-        issues_by_category = {category: [] for category in categories}
-        for issue in issues_filtered:
-            issues_by_category[issue.category.name].append(issue)
-        issues_by_group = issues_by_category
-        group_order = sorted(categories)  # 排序后的分类顺序
-    elif filter_by == 'severity':
-        severity_order = ['vital', 'critical', 'grave', 'normal', 'minor']
-        issues_by_severity = {severity: [] for severity in severity_order}
-        for issue in issues_filtered:
-            severity_name = issue.severity.name
-            if severity_name in issues_by_severity:
-                issues_by_severity[severity_name].append(issue)
-        issues_by_group = issues_by_severity
-        group_order = severity_order
-    #############################
-
+        # 如果选择了特定的实例，只显示这个实例，忽略其他筛选条件
+        selected_issue = next((issue for issue in issues_all if issue.id == selected_issue_id), None)
+        # 重置筛选参数的值
+        issues_by_group = {'Selected': [selected_issue]}
+        group_order = ['Selected']
+        filter_by = 'none'
+        start_date_str = '2024-01-01'
+        end_date_str = datetime.now().strftime('%Y-%m-%d')
+        ###################################
+        expanded_issue_id = selected_issue_id
+        
     return render_template('issue/page.html', 
                            page_theme=theme,
                            issues=issues_all,
@@ -183,7 +195,8 @@ def issue_page():
                            group_order=group_order,
                            filter_by=filter_by,
                            default_start_date=start_date_str,
-                           default_end_date=end_date_str
+                           default_end_date=end_date_str,
+                           expanded_issue_id=expanded_issue_id
                            )
 
 

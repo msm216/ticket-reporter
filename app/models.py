@@ -1,7 +1,7 @@
 import enum
 
 from datetime import datetime, timezone
-from sqlalchemy import event, Enum, Table, Column, ForeignKey, String, Integer, Float, DateTime
+from sqlalchemy import event, Enum, Table, Column, ForeignKey, String, Integer, Float, DateTime, Boolean
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 
@@ -39,55 +39,60 @@ class Model(enum.Enum):
 
 # Severity of Issue
 class Severity(enum.Enum):
-    vital = "vital"
-    critical = "critical"
-    grave = "grave"
-    normal = "normal"
-    minor = "minor"
+    vital = "Vital"
+    critical = "Critical"
+    grave = "Grave"
+    normal = "Normal"
+    minor = "Minor"
 
 # Category of Issue
 class Category(enum.Enum):
-    rnd = "R&D"
-    quality = "quality"
-    connectivity = "connectivity"
-    platform = "platform"
+    development = "R&D"
+    quality = "Quality"
+    connectivity = "Connectivity"
+    platform = "Platform"
+
+# Reporter of Issue
+class Reporter(enum.Enum):
+    colleg_01 = "Peter"
+    colleg_02 = "Louis"
+    colleg_03 = "Chris"
 
 # Progress of Issue
 class Progress(enum.Enum):
-    analyzing = "analyzing"
-    pending = "pending"
-    verify = "verify"
-    closed = "closed"
+    analyzing = "Analyzing"
+    pending = "Pending"
+    verify = "Verify"
+    closed = "Closed"
 
 # Type of Ticket
 class Type(enum.Enum):
-    abnormal = "abnormal"
-    commission = "commission"
-    connectivity = "connectivity"
-    platform = "platform"
+    abnormal = "Abnormal"
+    commission = "Commission"
+    connectivity = "Connectivity"
+    platform = "Platform"
 
 # Status of Ticket
 class Status(enum.Enum):
-    open = "open"
-    processing = "processing"
-    closed = "closed"
+    open = "Open"
+    processing = "Processing"
+    closed = "Closed"
 
 # Action taken in Task
 class Action(enum.Enum):
-    consult = "consult"
-    remote_debug = "remote_debug"
-    onsite_debug = "onsite_debug"
-    inhouse_repair = "inhouse_repair"
-    onsite_repair = "onsite_repair"
-    spare_delivery = "spare_delivery"
-    callback = "callback"
+    consult = "Consult"
+    debug = "Debug"
+    repair = "Repair"
+    commission = "Commission"
+    spare_delivery = "Spare_delivery"
+    callback = "Callback"
 
 # Result of Task
 class Result(enum.Enum):
-    pending = "pending"
-    observation = "observation"
-    solved = "solved"
-    failed = "failed"
+    pending = "Pending"
+    observation = "Observation"
+    solved = "Solved"
+    failed = "Failed"
 
 
 # Ticket <--> Issue 关联表
@@ -209,7 +214,7 @@ class Ticket(db.Model):
     title_cn = Column(String(40), nullable=True, unique=True)
     create_on = Column(DateTime, default=lambda: datetime.now(timezone.utc).date())
     ticket_type = Column(Enum(Type), nullable=True)
-    description = Column(String(80), nullable=False)
+    description = Column(String(160), nullable=False)
     status = Column(Enum(Status), default=Status.open, nullable=False)
     first_response = Column(String(80), nullable=True)
     first_response_on = Column(DateTime, nullable=True)
@@ -235,7 +240,7 @@ event.listen(Ticket, 'before_insert', Ticket.generate_ticket_id)
 
 
 
-# | id | execute_on | action | description | result | ticket_id |
+# | id | execute_on | action | description | on_site | result | ticket_id |
 # Task --> Ticket
 class Task(db.Model):
 
@@ -245,6 +250,7 @@ class Task(db.Model):
     execute_on = Column(DateTime, default=lambda: datetime.now(timezone.utc).date())
     action = Column(Enum(Action), nullable=False)
     description = Column(String(80), nullable=False)
+    on_site = Column(Boolean, default=False, nullable=False)
     result = Column(Enum(Result), default=Result.pending, nullable=False)
     # 外键指向一个 Ticket 实例
     ticket_id = Column(String(20), ForeignKey('ticket_table.id'), nullable=False)
@@ -275,8 +281,9 @@ class Issue(db.Model):
     title = Column(String(40), nullable=False, unique=True)
     title_cn = Column(String(40), nullable=True, unique=True)
     report_on = Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
+    report_by = Column(Enum(Reporter), nullable=False)
     category = Column(Enum(Category), nullable=False)
-    description = Column(String(80), nullable=False)
+    description = Column(String(160), nullable=False)
     severity = Column(Enum(Severity), nullable=True)
     progress = Column(Enum(Progress), default=Progress.analyzing, nullable=False)
     final_resolution = Column(String(80), nullable=True)

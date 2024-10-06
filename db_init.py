@@ -56,7 +56,7 @@ if __name__ == '__main__':
             db.session.add(new_client)
             try:
                 db.session.commit()
-                print(f"New device: {new_client} committed")
+                print(f"New client: {new_client} committed")
             except IntegrityError as e:
                 db.session.rollback()
                 print(f"Error '{e}' occurred while committing {new_client}")
@@ -77,7 +77,7 @@ if __name__ == '__main__':
                 db.session.add(new_site)
                 try:
                     db.session.commit()
-                    print(f"New device: {new_site} committed")
+                    print(f"New site: {new_site} committed")
                 except IntegrityError as e:
                     db.session.rollback()
                     print(f"Error '{e}' occurred while committing {new_site}")
@@ -124,6 +124,7 @@ if __name__ == '__main__':
                 create_on=random_date(90),
                 ticket_type=random.choice(list(Type)),
                 description=f"This occured on site: {random_string(40)}",
+                status=random.choice(list(Status))
             )
             ticket_inst.append(new_ticket)
             db.session.add(new_ticket)
@@ -142,6 +143,7 @@ if __name__ == '__main__':
                 execute_on=random_date(60),
                 action=random.choice(list(Action)),
                 description=f"This action has been taken: {random_string(20)}",
+                on_site=random.choice([True, False]),
                 result=random.choice(list(Result)),
                 ticket_id=random_ticket.id
             )
@@ -164,6 +166,7 @@ if __name__ == '__main__':
             new_issue = Issue(
                 title=random_string(20),
                 report_on=random_date(90),
+                report_by=random.choice(list(Reporter)),
                 category=random.choice(list(Category)),
                 description=f"This was the issue: {random_string(40)}",
                 severity=random.choice(list(Severity)),

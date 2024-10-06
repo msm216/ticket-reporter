@@ -1,9 +1,66 @@
 <form class="modal-form" method="POST">
-    <div class="form-group">
-        <label for="description">Resolution Description</label>
-        <textarea class="form-control" id="description" name="description"></textarea>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="ticketNumber">Issue Title</label>
+                <input type="text" class="form-control" id="issueTitle" placeholder="Enter issue title">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="issueTitleCN">Issue Title (CN)</label>
+                <input type="text" class="form-control" id="issueTitleCN" placeholder="Enter issue title in Chinese (optional)">
+            </div>
+        </div>
     </div>
-    <div class="form-group"></div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="reportOn">Report On</label>
+                <input type="date" class="form-control" id="reportOn" value="{{ today }}">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="reportBy">Report By:</label>
+                <select class="form-control" id="reportBy">
+                    <option value="colleg_01">Peter</option>
+                    <option value="colleg_02">Louis</option>
+                    <option value="colleg_02">Chris</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="issueCategory">Issue Category:</label>
+                <select class="form-control" id="issueCategory">
+                    <option value="development">R&D</option>
+                    <option value="quality">Quality</option>
+                    <option value="connectivity">Connectivity</option>
+                    <option value="platform">Platform</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="issueSeverity">Issue Severity:</label>
+                <select class="form-control" id="issueSeverity">
+                    <option value="vital">Vital</option>
+                    <option value="critical">Critical</option>
+                    <option value="grave">Grave</option>
+                    <option value="normal">Normal</option>
+                    <option value="minor">Minor</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="description">Issue Description</label>
+        <textarea class="form-control" id="issueDescription" placeholder="Enter issue description"></textarea>
+    </div>
+    <div class="form-group">
         <button id="modalSubmit" type="submit" class="btn btn-primary mt-3">Submit</button>
     </div>
 </form>

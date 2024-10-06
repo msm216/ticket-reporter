@@ -78,6 +78,8 @@
     </div>
     {% endfor %}
 </div>
+<!-- 返回页面顶部 -->
+<button class="btn btn-primary mt-3" id="backToTopBtn" onclick="scrollToTop()">TOP⬆️</button>
 {% endblock %}
 
 {% block modal %}
@@ -88,15 +90,15 @@
 <!-- 对实例的筛选项 -->
 <form id="issueControl" action="{{ url_for('issue_page') }}" method="GET">
     <div class="form-group">
-        <label for="issue-select">Select Issue</label>
+        <label for="issueSelect">Select Issue</label>
         <!-- 路由根据 name 参数获得值 -->
-        <select name="issueId" id="issue-select" required onchange="this.form.submit()">
+        <select id="issueSelect" name="issue-select" required onchange="this.form.submit()">
             <!-- 添加 'All' 选项，默认选中 -->
             <option value="all" title="Show all issues"
-                {% if request.args.get('issueId', 'all') == 'all' %}selected{% endif %}>All</option>
+                {% if request.args.get('issue-select', 'all') == 'all' %}selected{% endif %}>All</option>
             {% for issue in issues %}
                 <option value="{{ issue.id }}" title="{{ issue.title }}" 
-                        {% if request.args.get('issueId') == issue.id %}selected{% endif %}>
+                        {% if request.args.get('issue-select') == issue.id %}selected{% endif %}>
                     {{ issue.id }}
                 </option>
             {% endfor %}
@@ -104,33 +106,33 @@
     </div>
     <div class="form-group">
         <label for="issueStartDate">Start Date</label>
-        <input type="date" class="form-control" id="issueStartDate" name="startDate"
-               value="{{ request.args.get('startDate', default_start_date) }}">
+        <input type="date" class="form-control" id="issueStartDate" name="start-date"
+               value="{{ request.args.get('start-date', default_start_date) }}">
     </div>
     <div class="form-group">
         <label for="issueEndDate">End Date</label>
-        <input type="date" class="form-control" id="issueEndDate" name="endDate"
-               value="{{ request.args.get('endDate', default_end_date) }}">
+        <input type="date" class="form-control" id="issueEndDate" name="end-date"
+               value="{{ request.args.get('end-date', default_end_date) }}">
     </div>
     <!-- 提交按钮 -->
     <div class="form-group">
-        <button type="submit" class="btn btn-primary">Apply Filter</button>
+        <button type="submit" class="btn btn-primary">Apply Dates</button>
     </div>
     <!-- 只显示非 Closed 实例 -->
     <div class="form-group form-check">
-        <input type="checkbox" class="form-check-input" id="exclude-closed" name="excludeClosed"
-            {% if request.args.get('excludeClosed') == 'on' %}checked{% endif %}
+        <input type="checkbox" class="form-check-input" id="excludeClosed" name="exclude-closed"
+            {% if request.args.get('exclude-closed') == 'on' %}checked{% endif %}
             onchange="this.form.submit()">
-        <label class="form-check-label" for="exclude-closed">Open Issues</label>
+        <label class="form-check-label" for="excludeClosed">Open Issues</label>
     </div>
     <!-- 分组显示实例 -->
     <div class="form-group">
-        <label for="filter-option">Grouping by:</label>
-        <select name="filterBy" class="form-control" id="filter-option" onchange="this.form.submit()">
+        <label for="groupingBy">Grouping by:</label>
+        <select class="form-control" id="groupingBy" name="grouping-by" onchange="this.form.submit()">
             <!-- 默认不分组显示 -->
-            <option value="none" {% if filter_by == 'none' %}selected{% endif %}>None</option>
-            <option value="severity" {% if filter_by == 'severity' %}selected{% endif %}>Severity</option>
-            <option value="category" {% if filter_by == 'category' %}selected{% endif %}>Category</option>
+            <option value="none" {% if grouping_by == 'none' %}selected{% endif %}>None</option>
+            <option value="severity" {% if grouping_by == 'severity' %}selected{% endif %}>Severity</option>
+            <option value="category" {% if grouping_by == 'category' %}selected{% endif %}>Category</option>
             <!-- 可以继续扩展其他选项 -->
         </select>
     </div>
@@ -140,6 +142,9 @@
         <button type="button" class="btn btn-primary" onclick="resetFilters('{{ issue_url }}')">Reset Filters</button>
     </div>
 </form>
+<div class="form-group">
+    <button class="btn btn-primary mt-3" onclick="printTheme('issue')">PEPORT</button>
+</div>
 {% endblock %}
 
 {% block scripts %}

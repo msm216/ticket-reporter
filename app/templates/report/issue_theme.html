@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue Report - {{ instance.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/report/issue.css') }}">
+</head>
+<body>
+    <h1>Issue Report - {{ instance.title }}</h1>
+    <table>
+        <tr>
+            <th>Title</th>
+            <td>{{ instance.title }}</td>
+        </tr>
+        <tr>
+            <th>Title (CN)</th>
+            <td>{{ instance.title_cn if instance.title_cn else 'None' }}</td>
+        </tr>
+        <tr>
+            <th>Report Date</th>
+            <td>{{ instance.report_on }}</td>
+        </tr>
+        <tr>
+            <th>Category</th>
+            <td>{{ instance.category.name }}</td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td>{{ instance.description }}</td>
+        </tr>
+        <tr>
+            <th>Severity</th>
+            <td>{{ instance.severity.name if instance.severity else 'N/A' }}</td>
+        </tr>
+        <tr>
+            <th>Progress</th>
+            <td>{{ instance.progress.name }}</td>
+        </tr>
+        <tr>
+            <th>Final Resolution</th>
+            <td>{{ instance.final_resolution if instance.final_resolution else 'N/A' }}</td>
+        </tr>
+        <tr>
+            <th>Close Date</th>
+            <td>{{ instance.close_on if instance.close_on else 'N/A' }}</td>
+        </tr>
+    </table>
+    <h2>Resolutions</h2>
+    <table>
+        <tr>
+            <th>Update On</th>
+            <th>Description</th>
+        </tr>
+        {% for resolution in instance.resolutions %}
+        <tr>
+            <td>{{ resolution.update_on }}</td>
+            <td>{{ resolution.description }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="2">No resolutions found for this issue.</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

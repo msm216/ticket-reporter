@@ -17,16 +17,25 @@
     background-color: red;
 }
 .progress-indicator.pending {
-    background-color: orange;;
+    background-color: rgb(238, 184, 63);
 }
 .progress-indicator.verify {
-    background-color: lightblue;
+    background-color: rgb(85, 186, 190);
 }
 .progress-indicator.closed {
-    background-color: green;
+    background-color: rgb(84, 178, 68);
 }
 
 /* 对齐箭头按钮 */
 .toggle-icon {
     margin-left: 10px;
+}
+
+/* 限制 select 下拉菜单的高度并添加滚动条 */
+select {
+    width: auto; /* 保持选择框正常宽度 */
+}
+select option {
+    max-height: 120px; /* 设置最大高度，适应你的需求 */
+    overflow-y: auto;  /* 当高度超过设置时显示滚动条 */
 }

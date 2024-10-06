@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // 获取查询参数
+    const queryParams = new URLSearchParams(window.location.search);
+    // 打印所有查询参数
+    queryParams.forEach((value, key) => {
+        console.log(`${key}: ${value}`);
+    });
     // 获取所有卡片对象
     const toggleButtons = document.querySelectorAll('.toggle-icon');
     // 展开收缩卡片
@@ -23,9 +29,9 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 // 开启模态框
-function openModal(id, mode, objectType) {
+function openModal(id, mode, objectClass) {
     // 获取模态框模块
-    const moodalID = `${objectType}${capitalizeFirstLetter(mode)}Modal`;;
+    const moodalID = `${objectClass}${capitalizeFirstLetter(mode)}Modal`;
     console.log("Dynamic modal ID: ", moodalID);
     const modalModule = document.getElementById('modalModule');
     
@@ -34,7 +40,7 @@ function openModal(id, mode, objectType) {
     var titleObjectSection = document.getElementById('titleObjectSection');
     var titleIdSection = document.getElementById('titleIdSection');
     titleActionSection.textContent = mode ? capitalizeFirstLetter(mode) : 'Action';
-    titleObjectSection.textContent = objectType ? capitalizeFirstLetter(objectType) : 'Object';
+    titleObjectSection.textContent = objectClass ? capitalizeFirstLetter(objectClass) : 'Object';
     titleIdSection.textContent = id ? ` ${id}` : '';
     
     // 获取按钮元素
@@ -47,8 +53,8 @@ function openModal(id, mode, objectType) {
     var modalMode = document.getElementById('modalMode').value;
     console.log("Modal mode: ", modalMode);
 
-    // 根据不同模式获取数据并填充表单
-    fetch(`/load-form?mode=${encodeURIComponent(mode)}&objectType=${encodeURIComponent(objectType)}`)
+    // 传递参数到路由函数 load_form() 并获取返回的表单 HTML 内容
+    fetch(`/load-form?modal-mode=${encodeURIComponent(mode)}&object-class=${encodeURIComponent(objectClass)}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -56,12 +62,12 @@ function openModal(id, mode, objectType) {
             return response.text();
         })
         .then(data => {
-            // 把获取的内容插入到id为 modalForm 的区块中
+            // 把获取的 HTML 内容插入到id为 modalForm 的区块中
             document.getElementById('modalForm').innerHTML = data;
-
+            
             // 根据不同的 modalMode 动态设置 modalForm 的 action 路径
             var modalForm = modalModule.querySelector('.modal-form');
-            modalForm.action = id ? `/${objectType}/${id}/${mode}` : `/${objectType}/${mode}`;
+            modalForm.action = id ? `/${objectClass}/${id}/${mode}` : `/${objectClass}/${mode}`;
             console.log("Form action URL: ", modalForm.action);
 
             // 表单加载后显示模态框
@@ -92,9 +98,9 @@ function confirmAction(message, callback) {
 }
 
 // 删除实例
-function deleteInstance(id, objectType) {
+function deleteInstance(id, objectClass) {
     confirmAction('Are you sure you want to delete this instance?', function() {
-        const deleteUrl = `/${objectType}/${id}/delete`;
+        const deleteUrl = `/${objectClass}/${id}/delete`;
         fetch(deleteUrl, {
             method: 'DELETE',
             headers: {
@@ -111,15 +117,15 @@ function deleteInstance(id, objectType) {
 }
 
 // 打印实例
-function printInstance(id, objectType) {
-    const printUrl = `/${objectType}/${id}/print`;
+function printInstance(id, objectClass) {
+    const printUrl = `/${objectClass}/${id}/print`;
     window.open(printUrl, '_blank');
-    console.log('Printing', objectType, id);
+    console.log('Printing', objectClass, id);
 }
 
 // 打印主题
-function printTheme(objectType) {
-    const printUrl = `/${objectType}/print/`;
+function printTheme(objectClass) {
+    const printUrl = `/${objectClass}/print/`;
     window.open(printUrl, '_blank');
-    console.log('Printing', objectType);
+    console.log('Printing', objectClass);
 }

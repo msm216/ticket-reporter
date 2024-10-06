@@ -8,6 +8,7 @@ html, body {
     top: 0;
     width: 100%;
     z-index: 30;
+    background-color: rgb(255, 121, 0) !important;
     border-bottom: 2px solid #ddd;
 }
 /* ***************** BELOW NAVIGATION ***************** */

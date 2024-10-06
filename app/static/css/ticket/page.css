@@ -17,10 +17,10 @@
     background-color: red;
 }
 .status-indicator.processing {
-    background-color: orange;;
+    background-color: rgb(238, 184, 63);
 }
 .status-indicator.closed {
-    background-color: green;
+    background-color: rgb(84, 178, 68);
 }
 
 /* 对齐箭头按钮 */

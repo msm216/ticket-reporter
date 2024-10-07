@@ -3,13 +3,13 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="ticketNumber">Issue Title</label>
-                <input type="text" class="form-control" id="issueTitle" placeholder="Enter issue title">
+                <input type="text" class="form-control" id="issueTitle" name="title" placeholder="Enter issue title">
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label for="issueTitleCN">Issue Title (CN)</label>
-                <input type="text" class="form-control" id="issueTitleCN" placeholder="Enter issue title in Chinese (optional)">
+                <input type="text" class="form-control" id="issueTitleCN" name="title_cn" placeholder="Enter issue title in Chinese (optional)">
             </div>
         </div>
     </div>
@@ -17,13 +17,13 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="reportOn">Report On</label>
-                <input type="date" class="form-control" id="reportOn" value="{{ today }}">
+                <input type="date" class="form-control" id="reportOn" name="report_on" value="{{ today }}">
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label for="reportBy">Report By:</label>
-                <select class="form-control" id="reportBy">
+                <select class="form-control" id="reportBy" name="report_by">
                     <option value="colleg_01">Peter</option>
                     <option value="colleg_02">Louis</option>
                     <option value="colleg_02">Chris</option>
@@ -35,7 +35,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="issueCategory">Issue Category:</label>
-                <select class="form-control" id="issueCategory">
+                <select class="form-control" id="issueCategory" name="category">
                     <option value="development">R&D</option>
                     <option value="quality">Quality</option>
                     <option value="connectivity">Connectivity</option>
@@ -46,7 +46,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="issueSeverity">Issue Severity:</label>
-                <select class="form-control" id="issueSeverity">
+                <select class="form-control" id="issueSeverity" name="severity">
                     <option value="vital">Vital</option>
                     <option value="critical">Critical</option>
                     <option value="grave">Grave</option>
@@ -58,7 +58,7 @@
     </div>
     <div class="form-group">
         <label for="description">Issue Description</label>
-        <textarea class="form-control" id="issueDescription" placeholder="Enter issue description"></textarea>
+        <textarea class="form-control" id="issueDescription" name="description" placeholder="Enter issue description"></textarea>
     </div>
     <div class="form-group">
         <button id="modalSubmit" type="submit" class="btn btn-primary mt-3">Submit</button>

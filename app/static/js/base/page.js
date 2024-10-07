@@ -45,7 +45,6 @@ function openModal(id, mode, objectClass) {
     
     // 获取按钮元素
     var modalSubmit = document.getElementById('modalSubmit');
-    var modalButtton = document.getElementById('modalButton');
     
     // 赋值隐藏元素
     document.getElementById('instId').value = id || '';
@@ -63,7 +62,7 @@ function openModal(id, mode, objectClass) {
         })
         .then(data => {
             // 把获取的 HTML 内容插入到id为 modalForm 的区块中
-            document.getElementById('modalForm').innerHTML = data;
+            document.getElementById('modalContent').innerHTML = data;
             
             // 根据不同的 modalMode 动态设置 modalForm 的 action 路径
             var modalForm = modalModule.querySelector('.modal-form');
@@ -79,14 +78,15 @@ function openModal(id, mode, objectClass) {
         });
     
     // 根据不同的 modalMode 动态赋予不同的函数给 Test 按钮
+    var modalTestBtn = document.getElementById('modalTestBtn');
     if (mode === 'add') {
-        modalButtton.onclick = addInstance;
+        modalTestBtn.onclick = addInstance;
     } else if (mode === 'edit') {
-        modalButtton.onclick = editInstance;
+        modalTestBtn.onclick = editInstance;
     } else if (mode === 'update') {
-        modalButtton.onclick = updateInstance;
+        modalTestBtn.onclick = updateInstance;
     } else {
-        modalButtton.onclick = null;
+        modalTestBtn.onclick = null;
     }
 }
 

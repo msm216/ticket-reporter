@@ -72,11 +72,32 @@ def get_instance(inst_id:str, object_class:str, query:dict):
     return jsonify({'Error': 'Instance not found'}), 404
 
 
+# 添加新实例
 @app.route('/<object_class>/add', methods=['POST'])
 def add_instance(object_class:str):
     print(f"Adding new {object_class}...")
-
-    return jsonify(success=True)
+    # 根据类名获取类对象
+    object = OBJECTS.get(object_class)
+    if not object:
+        return jsonify(success=False, message=f"模型 {object_class} 不存在"), 400
+    # 获取表单数据并转换为字典
+    form_data = request.form.to_dict()
+    print(request.form)
+    # 如果没有提供 report_on，则使用当前日期
+    report_on = form_data.get('report_on')
+    if not report_on:
+        report_on = datetime.now()
+    else:
+        report_on = datetime.strptime(report_on, '%Y-%m-%d')
+    # 确保 `report_on` 在传递给模型时是一个有效的日期
+    form_data['report_on'] = report_on
+    # 创建新的模型实例，并将表单数据传入
+    new_instance = object(**form_data)
+    # 将新实例添加到数据库会话中并提交
+    db.session.add(new_instance)
+    db.session.commit()
+    #return jsonify(success=True, id=new_instance.id)
+    return redirect(f'/{object_class}')
 
 
 @app.route('/<object_class>/<inst_id>/update', methods=['POST'])
@@ -126,7 +147,7 @@ def generate_pdf(inst_id:str, object_class:str):
 def issue_page():
     
     theme = 'issue'
-    print(f"\nTheme of the page: '{theme}'.")
+    print(f"\npage theme: {theme}")
     print("\n".join([f"{key}: {value}" for key, value in request.args.items()]))
 
     # 获取所有 Issue 实例

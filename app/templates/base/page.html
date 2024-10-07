@@ -37,6 +37,8 @@
     </nav>
     <div class="container-fluid">
         <div class="main-row">
+            <!-- Modal of Pages -->
+            {% block modal %}{% endblock %}
             <div class="left-half">
                 <div class="content-header">
                     <div>
@@ -50,8 +52,6 @@
                 <div class="content-main">
                     <!-- Content of Pages -->
                     {% block content %}{% endblock %}
-                    <!-- Modal of Pages -->
-                    {% block modal %}{% endblock %}
                 </div>
             </div>
             <div class="right-half">

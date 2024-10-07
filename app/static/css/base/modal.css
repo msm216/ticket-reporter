@@ -19,6 +19,14 @@
     display: block; 
 }
 
-.modal-content {
+.modal-foreground {
+    background-color: white; /* 确保有背景色 */
     padding: 20px;
+    border-radius: 5px; /* 可选，添加边角圆润 */
+}
+
+.modal-content {
+    background-color: white; /* 确保有背景色 */
+    border: none;
+    box-shadow: none;
 }

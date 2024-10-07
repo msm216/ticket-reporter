@@ -279,7 +279,7 @@ class Issue(db.Model):
 
     id = Column(String(20), primary_key=True)
     title = Column(String(40), nullable=False, unique=True)
-    title_cn = Column(String(40), nullable=True, unique=True)
+    title_cn = Column(String(40), nullable=True)
     report_on = Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
     report_by = Column(Enum(Reporter), nullable=False)
     category = Column(Enum(Category), nullable=False)

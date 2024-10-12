@@ -108,9 +108,14 @@ def update_instance(object_class:str, inst_id:str):
 
 
 @app.route('/<object_class>/<inst_id>/delete', methods=['DELETE'])
-def delete_instance(object_class, ref_id):
-    print(f"Deleting {object_class}: {ref_id}")
-
+def delete_instance(object_class:str, inst_id:str):
+    print(f"Deleting {object_class}: {inst_id}")
+    # 根据类名获取类对象
+    object = OBJECTS.get(object_class)
+    # 根据 id 查询实例
+    instance = object.query.get(inst_id)
+    db.session.delete(instance)
+    db.session.commit()
     return jsonify(success=True)
 
 # 打印指定实例的 PDF 报告

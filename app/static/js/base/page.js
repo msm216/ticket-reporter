@@ -29,9 +29,9 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 // 开启模态框
-function openModal(id, mode, objectClass) {
+function openModal(instanceId, modalMode, objectClass) {
     // 获取模态框模块
-    const moodalID = `${objectClass}${capitalizeFirstLetter(mode)}Modal`;
+    const moodalID = `${objectClass}${capitalizeFirstLetter(modalMode)}Modal`;
     console.log("Dynamic modal ID: ", moodalID);
     const modalModule = document.getElementById('modalModule');
     
@@ -39,21 +39,20 @@ function openModal(id, mode, objectClass) {
     var titleActionSection = document.getElementById('titleActionSection');
     var titleObjectSection = document.getElementById('titleObjectSection');
     var titleIdSection = document.getElementById('titleIdSection');
-    titleActionSection.textContent = mode ? capitalizeFirstLetter(mode) : 'Action';
+    titleActionSection.textContent = modalMode ? capitalizeFirstLetter(modalMode) : 'Action';
     titleObjectSection.textContent = objectClass ? capitalizeFirstLetter(objectClass) : 'Object';
-    titleIdSection.textContent = id ? ` ${id}` : '';
+    titleIdSection.textContent = instanceId ? ` ${instanceId}` : '';
     
     // 获取按钮元素
     var modalSubmit = document.getElementById('modalSubmit');
     
     // 赋值隐藏元素
-    document.getElementById('instId').value = id || '';
-    document.getElementById('modalMode').value = mode;
-    var modalMode = document.getElementById('modalMode').value;
-    console.log("Modal mode: ", modalMode);
+    document.getElementById('instId').value = instanceId || '';
+    document.getElementById('modalMode').value = modalMode;
+    console.log("Modal mode: ", document.getElementById('modalMode').value);
 
     // 传递参数到路由函数 load_form() 并获取返回的表单 HTML 内容
-    fetch(`/load-form?modal-mode=${encodeURIComponent(mode)}&object-class=${encodeURIComponent(objectClass)}`)
+    fetch(`/load-form?modal-mode=${encodeURIComponent(modalMode)}&object-class=${encodeURIComponent(objectClass)}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -66,7 +65,7 @@ function openModal(id, mode, objectClass) {
             
             // 根据不同的 modalMode 动态设置 modalForm 的 action 路径
             var modalForm = modalModule.querySelector('.modal-form');
-            modalForm.action = id ? `/${objectClass}/${id}/${mode}` : `/${objectClass}/${mode}`;
+            modalForm.action = instanceId ? `/${objectClass}/${instanceId}/${modalMode}` : `/${objectClass}/${modalMode}`;
             console.log("Form action URL: ", modalForm.action);
 
             // 表单加载后显示模态框
@@ -79,11 +78,11 @@ function openModal(id, mode, objectClass) {
     
     // 根据不同的 modalMode 动态赋予不同的函数给 Test 按钮
     var modalTestBtn = document.getElementById('modalTestBtn');
-    if (mode === 'add') {
+    if (modalMode === 'add') {
         modalTestBtn.onclick = addInstance;
-    } else if (mode === 'edit') {
+    } else if (modalMode === 'edit') {
         modalTestBtn.onclick = editInstance;
-    } else if (mode === 'update') {
+    } else if (modalMode === 'update') {
         modalTestBtn.onclick = updateInstance;
     } else {
         modalTestBtn.onclick = null;
@@ -96,11 +95,10 @@ function confirmAction(message, callback) {
         callback();
     }
 }
-
 // 删除实例
-function deleteInstance(id, objectClass) {
-    confirmAction('Are you sure you want to delete this instance?', function() {
-        const deleteUrl = `/${objectClass}/${id}/delete`;
+function deleteInstance(instanceId, objectClass) {
+    confirmAction(`Are you sure you want to delete ${objectClass} instance ${instanceId}?`, function() {
+        const deleteUrl = `/${objectClass}/${instanceId}/delete`;
         fetch(deleteUrl, {
             method: 'DELETE',
             headers: {
@@ -117,10 +115,10 @@ function deleteInstance(id, objectClass) {
 }
 
 // 打印实例
-function printInstance(id, objectClass) {
-    const printUrl = `/${objectClass}/${id}/print`;
+function printInstance(instanceId, objectClass) {
+    const printUrl = `/${objectClass}/${instanceId}/print`;
     window.open(printUrl, '_blank');
-    console.log('Printing', objectClass, id);
+    console.log('Printing', objectClass, instanceId);
 }
 
 // 打印主题

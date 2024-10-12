@@ -65,7 +65,7 @@
                         <!-- 按钮自动传递当前issue的ID -->
                         <button class="btn btn-primary mt-3" onclick="openModal('{{ issue.id }}', 'edit', 'issue')">EDIT</button>
                         <button class="btn btn-primary mt-3" onclick="openModal('{{ issue.id }}', 'update', 'issue')">UPDATE</button>
-                        <button class="btn btn-primary mt-3" onclick="deleteInstance('{{ issue.id }}')">DELETE</button>
+                        <button class="btn btn-primary mt-3" onclick="deleteInstance('{{ issue.id }}', 'issue')">DELETE</button>
                         <button class="btn btn-primary mt-3" onclick="printInstance('{{ issue.id }}', 'issue')">PRINT</button>
                     </div>
                 </div>

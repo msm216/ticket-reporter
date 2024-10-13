@@ -22,12 +22,17 @@ document.addEventListener('DOMContentLoaded', function () {
             button.querySelector('i').classList.add('fa-chevron-down');
         });
     });
+    // 绑定点击事件给 modalSubmit 按钮
+    document.getElementById('modalSubmit').addEventListener('click', function () {
+        addInstance();
+    });
 });
 
 // 字符串首字母大写
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
 // 开启模态框
 function openModal(instanceId, modalMode, objectClass) {
     // 获取模态框模块
@@ -95,10 +100,46 @@ function confirmAction(message, callback) {
         callback();
     }
 }
+
+function addInstance(objectClass) {
+    // 禁用默认的表单提交
+    const form = document.getElementById('modalForm');
+    const formData = new FormData(form);  // 获取表单数据
+    const instanceTitle = formData.get('title');  // 获取表单数据
+    
+    confirmAction(`Are you sure you want to add ${objectClass} instance '${instanceTitle}?'`, function() {
+        const addUrl = `/${objectClass}/add`;
+        // 发起 AJAX 请求
+        fetch(addUrl, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'  // 确保后端可以识别这是一个 AJAX 请求
+            }
+        })
+        .then(response => response.json())  // 解析 JSON 响应
+        .then(data => {
+            if (data.success) {
+                // 显示成功信息并更新页面
+                alert('Instance added successfully!');
+                location.reload();  // 刷新页面或更新部分页面
+            } else {
+                // 显示错误信息
+                alert(`Error: ${data.message}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An unexpected error occurred.');
+        });
+    });
+}
+
 // 删除实例
 function deleteInstance(instanceId, objectClass) {
     confirmAction(`Are you sure you want to delete ${objectClass} instance ${instanceId}?`, function() {
         const deleteUrl = `/${objectClass}/${instanceId}/delete`;
+        // 发起 AJAX 请求
         fetch(deleteUrl, {
             method: 'DELETE',
             headers: {

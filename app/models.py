@@ -53,7 +53,7 @@ class Category(enum.Enum):
     platform = "Platform"
 
 # Reporter of Issue
-class Reporter(enum.Enum):
+class Member(enum.Enum):
     colleg_01 = "Peter"
     colleg_02 = "Louis"
     colleg_03 = "Chris"
@@ -200,6 +200,31 @@ event.listen(Site, 'before_insert', Site.generate_site_id)
 
 
 
+class Commission(db.Model):
+
+    __tablename__ = 'commission_table'
+
+    id = Column(String(20), primary_key=True)
+    commission_on = Column(DateTime, default=lambda: datetime.now(timezone.utc).date())
+    executor = Column(Enum(Member), nullable=False)
+    # 外键指向一个 Site 实例
+    site_id = Column(String(20), ForeignKey('site_table.id'), nullable=True)
+    # 外键指向一个 Device 实例
+    device_id = Column(String(20), ForeignKey('device_table.id'), nullable=True)
+
+    def __repr__(self):
+        return f'<Commission on: {self.commission_on}>'
+    
+    @staticmethod
+    def generate_comm_id(mapper, connection, target):
+        target.id = date_based_id(Commission, target, db.session, 'commission_on', prefix='RESUL')
+        return
+
+# 将事件监听器绑定到 Site 类的 before_insert 事件上
+event.listen(Commission, 'before_insert', Commission.generate_comm_id)
+
+
+
 # | id | title | title_cn | create_on | ticket_type | description | status |
 # | first_response | first_response_on | final_resolution | close_on |
 # Ticket <-- Task
@@ -281,7 +306,7 @@ class Issue(db.Model):
     title = Column(String(40), nullable=False, unique=True)
     title_cn = Column(String(40), nullable=True)
     report_on = Column(db.DateTime, default=lambda: datetime.now(timezone.utc).date())
-    report_by = Column(Enum(Reporter), nullable=False)
+    report_by = Column(Enum(Member), nullable=False)
     category = Column(Enum(Category), nullable=False)
     description = Column(String(160), nullable=False)
     severity = Column(Enum(Severity), nullable=True)

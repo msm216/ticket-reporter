@@ -8,15 +8,23 @@
             <span id="titleObjectSection">Object</span> 
             <span id="titleIdSection">ID</span>
         </h2>
-        <input id="instId" name="inst-id" type="hidden">
-        <input id="modalMode" name="modal-mode" type="hidden">
-        <div id="modalContent" class="modal-content">
-            <!-- 动态加载不同的表单 -->
-            <p>No Form Loaded</p>
-        </div>
-        <div id="modalControl" class="modal-control">
-            <button id="modalTestBtn" class="btn btn-primary mt-3">Test</button>
-            <button id="modalCancel" class="btn btn-primary mt-3" onclick="closeModal()">Cancel</button>
-        </div>
+        <form id="modalForm" class="modal-form" onsubmit="event.preventDefault(); handleSubmit();">
+            <!-- 隐藏字段 -->
+            <input id="instId" name="id" type="hidden">
+            <input id="taskMode" name="modal_mode" type="hidden">
+            <!-- 加载动态表单项 -->
+            <div id="formContent" class="form-content">
+                <p>No Form Loaded</p>
+            </div>
+            <!-- 按钮区域 -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <button type="submit" id="modalSubmitBtn" class="btn btn-primary w-100">Submit</button>
+                </div>
+                <div class="col-md-6">
+                    <button type="button" id="modalCancelBtn" class="btn btn-secondary w-100" onclick="closeModal()">Cancel</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>

@@ -1,0 +1,22 @@
+<!-- 模态框模块 -->
+<div id="modalModule" class="modal">
+    <div class="modal-background"></div>
+    <!-- 防止点击内容关闭模态框 -->
+    <div class="modal-foreground" onclick="event.stopPropagation()">
+        <h2 class="modal-title">
+            <span id="titleActionSection">Action</span> 
+            <span id="titleObjectSection">Object</span> 
+            <span id="titleIdSection">ID</span>
+        </h2>
+        <input id="instId" name="inst-id" type="hidden">
+        <input id="modalMode" name="modal-mode" type="hidden">
+        <div id="modalContent" class="modal-content">
+            <!-- 动态加载不同的表单 -->
+            <p>No Form Loaded</p>
+        </div>
+        <div id="modalControl" class="modal-control">
+            <button id="modalSubmitBtn" class="btn btn-primary mt-3">Submit</button>
+            <button id="modalCancelBtn" class="btn btn-primary mt-3" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>

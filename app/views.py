@@ -21,7 +21,7 @@ from .utilities import *
 #main = Blueprint('main', __name__)
 
 
-OBJECTS = {
+MODELS = {
         'issue': Issue,
         'resolution': Resolution,
         'ticket': Ticket,
@@ -60,9 +60,9 @@ def load_form():
 def get_instance(inst_id:str, object_class:str, query:dict):
     print(f"Getting {object_class}: {inst_id}...")
     # 根据类名获取类对象
-    object = OBJECTS.get(object_class)
+    object_model = MODELS.get(object_class)
     # 查询指定 id 的实例
-    instance = object.query.get(inst_id)
+    instance = object_model.query.get(inst_id)
     if instance:
         return jsonify({
             'title': instance.title,
@@ -77,27 +77,39 @@ def get_instance(inst_id:str, object_class:str, query:dict):
 def add_instance(object_class:str):
     print(f"Adding new {object_class}...")
     # 根据类名获取类对象
-    object = OBJECTS.get(object_class)
-    if not object:
-        return jsonify(success=False, message=f"模型 {object_class} 不存在"), 400
-    # 获取表单数据并转换为字典
-    form_data = request.form.to_dict()
-    print(request.form)
-    # 如果没有提供 report_on，则使用当前日期
-    report_on = form_data.get('report_on')
-    if not report_on:
-        report_on = datetime.now()
-    else:
-        report_on = datetime.strptime(report_on, '%Y-%m-%d')
-    # 确保 `report_on` 在传递给模型时是一个有效的日期
-    form_data['report_on'] = report_on
-    # 创建新的模型实例，并将表单数据传入
-    new_instance = object(**form_data)
-    # 将新实例添加到数据库会话中并提交
-    db.session.add(new_instance)
-    db.session.commit()
-    #return jsonify(success=True, id=new_instance.id)
-    return redirect(f'/{object_class}')
+    object_model = MODELS.get(object_class)
+    if not object_model:
+        return jsonify(success=False, message=f"Model {object_class} not exist"), 400
+    try:
+        # 根据 Content-Type 解析请求数据
+        if request.content_type == 'application/json':
+            # 获取 JSON 数据
+            form_data = request.json
+        else:
+            # 用于接收传统的表单提交
+            form_data = request.form.to_dict()
+        print(f"Received form data for '{object_class}': {form_data}")
+        # 如果没有提供 report_o，则使用当前日期
+        report_on = form_data.get('report_on')
+        if not report_on:
+            form_data['report_on'] = datetime.now()
+        else:
+            form_data['report_on'] = datetime.strptime(report_on, '%Y-%m-%d')
+        # 过滤无效字段，仅保留模型定义的字段
+        valid_fields = {key: form_data[key] for key in form_data if key in object_model.__table__.columns.keys()}
+        # 创建新的模型实例，将表单数据传入
+        new_instance = object_model(**valid_fields)
+        # 添加到数据库会话中并提交
+        db.session.add(new_instance)
+        db.session.commit()
+        # 返回成功的 JSON 响应
+        return jsonify(success=True, id=new_instance.id)
+    except Exception as e:
+        # 如果发生错误，回滚事务
+        db.session.rollback()  
+        print(f"Error adding {object_class}: {str(e)}")
+        # 返回失败的 JSON 响应
+        return jsonify(success=False, message=f"Failed to add instance: {str(e)}"), 500
 
 
 @app.route('/<object_class>/<inst_id>/update', methods=['POST'])
@@ -111,9 +123,9 @@ def update_instance(object_class:str, inst_id:str):
 def delete_instance(object_class:str, inst_id:str):
     print(f"Deleting {object_class}: {inst_id}")
     # 根据类名获取类对象
-    object = OBJECTS.get(object_class)
+    object_model = MODELS.get(object_class)
     # 根据 id 查询实例
-    instance = object.query.get(inst_id)
+    instance = object_model.query.get(inst_id)
     db.session.delete(instance)
     db.session.commit()
     return jsonify(success=True)
@@ -125,9 +137,9 @@ def generate_pdf(inst_id:str, object_class:str):
     if not inst_id:
         return "No issue selected", 400
     # 获取模型类
-    object = OBJECTS.get(object_class)
+    object_model = MODELS.get(object_class)
     # 查询选择的 Issue 实例
-    instance = object.query.get(inst_id)
+    instance = object_model.query.get(inst_id)
     #issue_id = request.args.get('inst_id')  # POST方法用 request.form.get()
     if not instance:
         return "Issue not found", 404
@@ -152,8 +164,8 @@ def generate_pdf(inst_id:str, object_class:str):
 def issue_page():
     
     theme = 'issue'
-    print(f"\npage theme: {theme}")
-    print("\n".join([f"{key}: {value}" for key, value in request.args.items()]))
+    print(f"\nPage theme: {theme}")
+    print("\nPage requests:".join([f"{key}: {value}" for key, value in request.args.items()]))
 
     # 获取所有 Issue 实例
     issues_all = Issue.query.all()
@@ -234,7 +246,7 @@ def issue_page():
 def ticket_page():
 
     theme = 'ticket'
-    print(f"Theme of the page: '{theme}'.\n")
+    print(f"\nTheme of the page: '{theme}'.")
 
     # 获取所有 Issue 实例
     tickets_all = Ticket.query.all()
@@ -300,10 +312,26 @@ def upload_ticket():
     return redirect(request.url)
 
 
+########################################## COMMISSION SPECIFIC ROUTES #########################################
+
+@app.route('/commission')
+def commission_page():
+
+    theme = 'commission'
+    print(f"\nTheme of the page: '{theme}'.")
+
+    return render_template('commission/page.html'
+                           )
+
+
 ############################################ SERVICE SPECIFIC ROUTES ##########################################
 
 @app.route('/service')
 def service_page():
+
+    theme = 'service'
+    print(f"\nTheme of the page: '{theme}'.")
+
     return render_template('service/page.html'
                            )
 
@@ -312,5 +340,9 @@ def service_page():
 
 @app.route('/about')
 def about_page():
+
+    theme = 'about'
+    print(f"\nTheme of the page: '{theme}'.")
+
     return render_template('about.html',
                            last_update_date=last_commit_time())

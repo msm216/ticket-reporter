@@ -166,7 +166,7 @@ if __name__ == '__main__':
             new_issue = Issue(
                 title=random_string(20),
                 report_on=random_date(90),
-                report_by=random.choice(list(Reporter)),
+                report_by=random.choice(list(Member)),
                 category=random.choice(list(Category)),
                 description=f"This was the issue: {random_string(40)}",
                 severity=random.choice(list(Severity)),

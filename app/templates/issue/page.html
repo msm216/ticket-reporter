@@ -11,7 +11,7 @@
 {% block page_subheader_text %}Welcome to the Issue page.{% endblock %}
 
 {% block add_button %}
-<button id="addInstBtn" class="btn btn-primary mt-3" onclick="openModal('', 'add', 'issue')">ADD</button>
+<button id="addInstBtn" class="btn btn-primary mt-3" onclick="openModal('issue', '', 'add')">ADD</button>
 {% endblock %}
 
 {% block content %}
@@ -63,10 +63,10 @@
                             <p>No Resolutions available.</p>
                         {% endif %}
                         <!-- 按钮自动传递当前issue的ID -->
-                        <button class="btn btn-primary mt-3" onclick="openModal('{{ issue.id }}', 'edit', 'issue')">EDIT</button>
-                        <button class="btn btn-primary mt-3" onclick="openModal('{{ issue.id }}', 'update', 'issue')">UPDATE</button>
-                        <button class="btn btn-primary mt-3" onclick="deleteInstance('{{ issue.id }}', 'issue')">DELETE</button>
-                        <button class="btn btn-primary mt-3" onclick="printInstance('{{ issue.id }}', 'issue')">PRINT</button>
+                        <button class="btn btn-primary mt-3" onclick="openModal('issue', '{{ issue.id }}', 'edit')">EDIT</button>
+                        <button class="btn btn-primary mt-3" onclick="openModal('issue', '{{ issue.id }}', 'update')">UPDATE</button>
+                        <button class="btn btn-primary mt-3" onclick="deleteInstance('issue', '{{ issue.id }}')">DELETE</button>
+                        <button class="btn btn-primary mt-3" onclick="printInstance( 'issue', '{{ issue.id }}')">PRINT</button>
                     </div>
                 </div>
             </div>
@@ -148,5 +148,8 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/issue/page.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/issue/modal.js') }}" defer></script>
+<!-- <script src="{{ url_for('static', filename='js/issue/modal.js') }}" defer></script> -->
+{% endblock %}
+
+{% block footer %}
 {% endblock %}

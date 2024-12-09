@@ -1,13 +1,47 @@
-<form class="modal-form" method="POST">
-    <div class="form-group">
-        <label for="title">Issue Title</label>
-        <input type="text" class="form-control" id="title" name="title" value="">
-    </div>
-    <div class="form-group">
-        <label for="description">Description</label>
-        <textarea class="form-control" id="description" name="description"></textarea>
-    </div>
-    <div class="form-group">
-        <button id="modalSubmit" type="submit" class="btn btn-primary mt-3">Submit</button>
-    </div>
-</form>
+<div class="form-group">
+    <label for="instanceId">Instance ID</label>
+    <input type="text" class="form-control" id="instanceId" name="id" readonly>
+</div>
+<div class="form-group">
+    <label for="issueTitle">Issue Title</label>
+    <input type="text" class="form-control" id="issueTitle" name="title" placeholder="Enter issue title">
+</div>
+<div class="form-group">
+    <label for="issueTitleCN">Issue Title (CN)</label>
+    <input type="text" class="form-control" id="issueTitleCN" name="title_cn" placeholder="Enter issue title in Chinese (optional)">
+</div>
+<div class="form-group">
+    <label for="reportOn">Report On</label>
+    <input type="date" class="form-control" id="reportOn" name="report_on">
+</div>
+<div class="form-group">
+    <label for="reportBy">Report By</label>
+    <select class="form-control" id="reportBy" name="report_by">
+        <option value="colleg_01">Peter</option>
+        <option value="colleg_02">Louis</option>
+        <option value="colleg_03">Chris</option>
+    </select>
+</div>
+<div class="form-group">
+    <label for="issueCategory">Issue Category</label>
+    <select class="form-control" id="issueCategory" name="category">
+        <option value="development">R&D</option>
+        <option value="quality">Quality</option>
+        <option value="connectivity">Connectivity</option>
+        <option value="platform">Platform</option>
+    </select>
+</div>
+<div class="form-group">
+    <label for="issueSeverity">Issue Severity</label>
+    <select class="form-control" id="issueSeverity" name="severity">
+        <option value="vital">Vital</option>
+        <option value="critical">Critical</option>
+        <option value="grave">Grave</option>
+        <option value="normal">Normal</option>
+        <option value="minor">Minor</option>
+    </select>
+</div>
+<div class="form-group">
+    <label for="issueDescription">Issue Description</label>
+    <textarea class="form-control" id="issueDescription" name="description" placeholder="Enter issue description"></textarea>
+</div>

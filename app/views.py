@@ -57,18 +57,28 @@ def load_form():
 
 
 @app.route('/<object_class>/<inst_id>', methods=['GET'])
-def get_instance(inst_id:str, object_class:str, query:dict):
+def get_instance(inst_id:str, object_class:str):
     print(f"Getting {object_class}: {inst_id}...")
     # 根据类名获取类对象
     object_model = MODELS.get(object_class)
+    if not object_model:
+        return jsonify({'Error': f'Model {object_class} not found'}), 404
     # 查询指定 id 的实例
     instance = object_model.query.get(inst_id)
     if instance:
-        return jsonify({
-            'title': instance.title,
-            'description': instance.description,
-            # 其他字段
-        })
+        # 动态获取模型实例的所有属性值
+        instance_data = {}
+        for column in object_model.__table__.columns:
+            value = getattr(instance, column.name)
+            if isinstance(value, enum.Enum):  # 如果是枚举，取其值
+                instance_data[column.name] = value.value
+            elif isinstance(value, datetime):  # 如果是日期，转化为字符串
+                instance_data[column.name] = value.strftime('%Y-%m-%d %H:%M:%S')
+            elif isinstance(value, (str, int, float, bool, type(None))):
+                instance_data[column.name] = value
+            else:
+                instance_data[column.name] = str(value)
+        return jsonify(instance_data)
     return jsonify({'Error': 'Instance not found'}), 404
 
 
@@ -81,13 +91,11 @@ def add_instance(object_class:str):
     if not object_model:
         return jsonify(success=False, message=f"Model {object_class} not exist"), 400
     try:
-        # 根据 Content-Type 解析请求数据
+        # 通过请求头区分数据获取方式
         if request.content_type == 'application/json':
-            # 获取 JSON 数据
-            form_data = request.json
+            form_data = request.json  # 获取 JSON 数据
         else:
-            # 用于接收传统的表单提交
-            form_data = request.form.to_dict()
+            form_data = request.form.to_dict()   # 用于接收传统的表单提交
         print(f"Received form data for '{object_class}': {form_data}")
         # 如果没有提供 report_o，则使用当前日期
         report_on = form_data.get('report_on')
@@ -110,6 +118,38 @@ def add_instance(object_class:str):
         print(f"Error adding {object_class}: {str(e)}")
         # 返回失败的 JSON 响应
         return jsonify(success=False, message=f"Failed to add instance: {str(e)}"), 500
+
+
+# 修改现有实例
+@app.route('/<object_class>/<int:instance_id>/edit', methods=['PUT'])
+def edit_instance(object_class: str, instance_id: int):
+    print(f"Editing {object_class} instance: {instance_id}...")
+    # 根据类名获取类对象
+    object_model = MODELS.get(object_class)
+    if not object_model:
+        return jsonify(success=False, message=f"Model {object_class} not exist"), 400
+    try:
+        # 通过请求头区分数据获取方式
+        if request.content_type == 'application/json':
+            form_data = request.json  # 获取 JSON 数据
+        else:
+            form_data = request.form.to_dict()  # 用于接收传统的表单提交
+        print(f"Received form data for '{object_class}': {form_data}")
+        # 查询数据库中的实例
+        instance = object_model.query.get(instance_id)
+        if not instance:
+            return jsonify(success=False, message=f"{object_class} instance with ID {instance_id} not found"), 404
+        # 更新实例的属性
+        for key, value in form_data.items():
+            if key in object_model.__table__.columns.keys():
+                setattr(instance, key, value)
+        # 提交数据库更新
+        db.session.commit()
+        return jsonify(success=True, message="Instance updated successfully")
+    except Exception as e:
+        db.session.rollback()  # 如果发生错误，回滚事务
+        print(f"Error updating {object_class}: {str(e)}")
+        return jsonify(success=False, message="Failed to update instance: " + str(e)), 500
 
 
 @app.route('/<object_class>/<inst_id>/update', methods=['POST'])

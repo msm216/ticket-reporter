@@ -35,8 +35,8 @@ function capitalizeFirstLetter(string) {
 function openModal(objectClass, instanceId, taskMode) {
     const modalId = `${objectClass}${capitalizeFirstLetter(taskMode)}Modal`;
     console.log("Dynamic modal ID: ", modalId);
-    // 获取模态框模块
-    const modalModule = document.getElementById('modalModule');
+    const modalModule = document.getElementById('modalModule');   // 获取模态框模块
+    const formContent = document.getElementById('formContent');   // 获取表单内容区块
     // 设置标题
     document.getElementById('titleActionSection').textContent = taskMode ? capitalizeFirstLetter(taskMode) : 'Task';
     document.getElementById('titleObjectSection').textContent = objectClass ? capitalizeFirstLetter(objectClass) : 'Object';
@@ -45,15 +45,40 @@ function openModal(objectClass, instanceId, taskMode) {
     document.getElementById('instId').value = instanceId || '';
     document.getElementById('taskMode').value = taskMode;
     console.log("Modal mode: ", document.getElementById('taskMode').value);
-    // 传递参数到路由函数 load_form() 并获取返回的表单 HTML 内容
+    // Step 1: 模板传递参数到路由函数 load_form() 并获取返回 HTML
     fetch(`/load-form?modal-mode=${encodeURIComponent(taskMode)}&object-class=${encodeURIComponent(objectClass)}`)
         .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) throw new Error('Failed to load form');
             return response.text();
         })
-        .then(data => {
-            // 把获取的 HTML 内容插入到id为 formContent 的区块中
-            document.getElementById('formContent').innerHTML = data;
+        .then(formHTML => {
+            // 将获取到的表单内容插入到 id 为 formContent 的区块中
+            formContent.innerHTML = formHTML;
+            // Step 2: 如果是编辑模式，加载实例数据并填充表单
+            if (taskMode === 'edit' && instanceId) {
+                fetch(`/${objectClass}/${instanceId}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to fetch instance data');
+                        return response.json();
+                    })
+                    .then(instanceData => {
+                        console.log("Fetched instance data:", instanceData);
+                        // 动态填充表单字段
+                        for (const [key, value] of Object.entries(instanceData)) {
+                            //const inputField = document.querySelector(`[name="${key}"]`);
+                            const inputField = document.querySelector(`#modalForm [name="${key}"]`);
+                            if (inputField) {
+                                inputField.value = value; // 将值填充到对应字段
+                            }
+                        }
+                        // 特殊处理只读字段（如 ID）
+                        const idField = document.querySelector('#modalForm #instanceId');
+                        if (idField) idField.value = instanceId;
+                    })
+                    .catch(error => {
+                        console.error('Error loading instance data:', error);
+                    });
+            }
             // 显示模态框
             modalModule.style.display = "block";
         })
@@ -104,7 +129,7 @@ function handleSubmit() {
 
 // 添加实例
 function addInstance(objectClass) {
-    console.log('Adding instance of', objectClass);
+    console.log(`Adding instance of ${objectClass}`);
     // 获取表单
     const form = document.getElementById('modalForm');
     const formData = new FormData(form);  // 获取表单数据
@@ -123,8 +148,8 @@ function addInstance(objectClass) {
         // 发起 AJAX 请求
         fetch(addUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(jsonData)  // 确保后端可以识别这是一个 AJAX 请求
+            body: JSON.stringify(jsonData),  // 确保后端可以识别这是一个 AJAX 请求
+            headers: { 'Content-Type': 'application/json' }
         })
         .then(response => {
             console.log("Response status:", response.status); // 检查响应状态
@@ -150,7 +175,56 @@ function addInstance(objectClass) {
 
 // 编辑实例
 function editInstance(objectClass, instanceId) {
-    console.log('Editing', objectClass, instanceId);
+    console.log(`Editing instance of ${objectClass} with ID ${instanceId}`);
+    if (!instanceId) {
+        alert("Instance ID is required for editing.");
+        return;
+    }
+    // 获取表单
+    const form = document.getElementById('modalForm');
+    const formData = new FormData(form);  // 获取表单数据
+    const jsonData = Object.fromEntries(formData.entries()); // 转换为 JSON 对象
+    // 移除不必要的字段
+    delete jsonData["modal_mode"];
+    delete jsonData["inst_id"];
+    // 生成确认消息
+    const confirmationMessage = generateConfirmationMessage(jsonData);
+    // 确认修改内容
+    confirmAction(confirmationMessage, function () {
+        // 设置修改实例的路由
+        const editUrl = `/${objectClass}/${instanceId}/edit`;
+        console.log("Sending editInstance request to:", editUrl); // 检查 URL
+        console.log("Form data:", jsonData); // 检查 JSON 数据
+        // 发起 AJAX 请求
+        fetch(editUrl, {
+            method: 'POST',
+            body: JSON.stringify(jsonData),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'  // 确保后端可以识别这是一个 AJAX 请求
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            console.log("Response status:", response.status); // 检查响应状态
+            return response.json();
+        })
+        .then(data => {
+            console.log("Response data:", data); // 检查返回数据
+            if (data.success) {
+                // 显示成功信息并更新页面
+                alert('Instance updated successfully!');
+                location.reload();  // 刷新页面或更新部分页面
+            } else {
+                // 显示错误信息
+                alert(`Error: ${data.message}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An unexpected error occurred.');
+        });
+    });
 }
 
 

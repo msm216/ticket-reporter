@@ -62,8 +62,8 @@
                         <!-- 按钮自动传递当前issue的ID -->
                         <button class="btn btn-primary mt-3" onclick="openModal('{{ ticket.id }}', 'edit', 'ticket')">EDIT</button>
                         <button class="btn btn-primary mt-3" onclick="openModal('{{ ticket.id }}', 'update', 'ticket')">UPDATE</button>
-                        <button class="btn btn-primary mt-3" onclick="deleteInstance('{{ ticket.id }}')">DELETE</button>
-                        <button class="btn btn-primary mt-3" onclick="printInstance('{{ ticket.id }}', 'ticket')">PRINT</button>
+                        <button class="btn btn-primary mt-3" onclick="deleteInstance('ticket', '{{ ticket.id }}')">DELETE</button>
+                        <button class="btn btn-primary mt-3" onclick="printInstance('ticket', '{{ ticket.id }}')">PRINT</button>
                     </div>
                 </div>
             </div>
@@ -111,7 +111,7 @@
         </select>
     </div>
 </form>
-<form id="uploadForm" action="{{ url_for('upload_ticket') }}" method="post" enctype="multipart/form-data">
+<form id="uploadForm" action="{{ url_for('main.upload_ticket') }}" method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label class="label">Upload CSV/XLSX File</label>
         <div class="control">

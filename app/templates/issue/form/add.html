@@ -1,3 +1,4 @@
+<form class="modal-form" method="POST" action="{{ url_for('main.add_instance', object_class='issue') }}">
 <div class="row">
     <div class="col-md-6">
         <label for="issueTitle">Issue Title</label>
@@ -47,3 +48,8 @@
     <label for="issueDescription">Issue Description</label>
     <textarea class="form-control" id="issueDescription" name="description" placeholder="Enter issue description"></textarea>
 </div>
+
+<div class="form-group">
+    <button id="modalSubmit" type="submit" class="btn btn-primary mt-3">Submit</button>
+</div>
+</form>

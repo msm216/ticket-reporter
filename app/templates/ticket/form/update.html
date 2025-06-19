@@ -1,9 +1,22 @@
-<form class="modal-form" method="POST">
+<form class="modal-form" method="POST" id="updateForm">
     <div class="form-group">
         <label for="description">Resolution Description</label>
         <textarea class="form-control" id="description" name="description"></textarea>
     </div>
-    <div class="form-group"></div>
+    <div class="form-group">
         <button id="modalSubmit" type="submit" class="btn btn-primary mt-3">Submit</button>
     </div>
-</div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 获取当前选中的ticket ID
+        const ticketId = document.querySelector('#ticketIdInput') ? 
+                        document.querySelector('#ticketIdInput').value : '';
+        
+        if (ticketId) {
+            // 设置表单的action属性
+            document.getElementById('updateForm').action = "{{ url_for('main.update_instance', object_class='ticket', inst_id='') }}" + ticketId;
+        }
+    });
+</script>

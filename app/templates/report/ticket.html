@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Report - {{ inst.id }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/report/ticket.css') }}">
+</head>
+<body>
+    <div class="report-header">
+        <div class="report-title">Ticket Report</div>
+        <div class="report-id">{{ inst.id }}</div>
+        <div>Generated on: {{ inst.create_on }}</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Ticket Information</div>
+        <div class="info-row">
+            <div class="info-label">Title:</div>
+            <div class="info-value">{{ inst.title }}</div>
+        </div>
+        {% if inst.title_cn %}
+        <div class="info-row">
+            <div class="info-label">Chinese Title:</div>
+            <div class="info-value">{{ inst.title_cn }}</div>
+        </div>
+        {% endif %}
+        <div class="info-row">
+            <div class="info-label">Created On:</div>
+            <div class="info-value">{{ inst.create_on.strftime('%Y-%m-%d') }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Type:</div>
+            <div class="info-value">{{ inst.ticket_type.value if inst.ticket_type else 'Not specified' }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Status:</div>
+            <div class="info-value">{{ inst.status.value }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Description:</div>
+        </div>
+        <div class="description-box">
+            {{ inst.description }}
+        </div>
+    </div>
+
+    {% if inst.first_response %}
+    <div class="section">
+        <div class="section-title">First Response</div>
+        <div class="info-row">
+            <div class="info-label">Date:</div>
+            <div class="info-value">{{ inst.first_response_on.strftime('%Y-%m-%d') if inst.first_response_on else 'Not specified' }}</div>
+        </div>
+        <div class="description-box">
+            {{ inst.first_response }}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if inst.final_resolution %}
+    <div class="section">
+        <div class="section-title">Final Resolution</div>
+        <div class="info-row">
+            <div class="info-label">Closed On:</div>
+            <div class="info-value">{{ inst.close_on.strftime('%Y-%m-%d') if inst.close_on else 'Not specified' }}</div>
+        </div>
+        <div class="description-box">
+            {{ inst.final_resolution }}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if inst.devices %}
+    <div class="section">
+        <div class="section-title">Related Devices</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Device ID</th>
+                    <th>Model</th>
+                    <th>Material</th>
+                    <th>Installation Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for device in inst.devices %}
+                <tr>
+                    <td>{{ device.id }}</td>
+                    <td>{{ device.model.value }}</td>
+                    <td>{{ device.material }}</td>
+                    <td>{{ device.install_on.strftime('%Y-%m-%d') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if inst.issues %}
+    <div class="section">
+        <div class="section-title">Related Issues</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Issue ID</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Severity</th>
+                    <th>Progress</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for issue in inst.issues %}
+                <tr>
+                    <td>{{ issue.id }}</td>
+                    <td>{{ issue.title }}</td>
+                    <td>{{ issue.category.value }}</td>
+                    <td>{{ issue.severity.value if issue.severity else 'Not specified' }}</td>
+                    <td>{{ issue.progress.value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if inst.tasks %}
+    <div class="section">
+        <div class="section-title">Tasks</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Task ID</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                    <th>On Site</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in inst.tasks %}
+                <tr>
+                    <td>{{ task.id }}</td>
+                    <td>{{ task.execute_on.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ task.action.value }}</td>
+                    <td>{{ 'Yes' if task.on_site else 'No' }}</td>
+                    <td>{{ task.result.value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        <p>This is an automatically generated report. Please contact support for any questions.</p>
+    </div>
+</body>
+</html>

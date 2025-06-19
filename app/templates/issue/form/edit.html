@@ -1,6 +1,8 @@
+<form class="modal-form" method="POST" id="editForm">
 <div class="form-group">
     <label for="instanceId">Instance ID</label>
     <input type="text" class="form-control" id="instanceId" name="id" readonly>
+    <input type="hidden" id="issueIdInput" value="">
 </div>
 <div class="form-group">
     <label for="issueTitle">Issue Title</label>
@@ -45,3 +47,21 @@
     <label for="issueDescription">Issue Description</label>
     <textarea class="form-control" id="issueDescription" name="description" placeholder="Enter issue description"></textarea>
 </div>
+
+<div class="form-group">
+    <button id="modalSubmit" type="submit" class="btn btn-primary mt-3">Submit</button>
+</div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 获取当前选中的issue ID
+        const issueId = document.querySelector('#issueIdInput') ? 
+                        document.querySelector('#issueIdInput').value : '';
+        
+        if (issueId) {
+            // 设置表单的action属性
+            document.getElementById('editForm').action = "{{ url_for('main.edit_instance', object_class='issue', instance_id='') }}" + issueId;
+        }
+    });
+</script>

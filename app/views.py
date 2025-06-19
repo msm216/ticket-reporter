@@ -6,19 +6,19 @@ from io import BytesIO
 from weasyprint import HTML
 
 from flask import Flask
-from flask import current_app as app
+from flask import current_app
 from flask import request
 from flask import render_template, flash, redirect, url_for, jsonify, send_file
-#from flask import Blueprint
+from flask import Blueprint
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 
-#from . import db
+from . import db
 from .models import *
 from .utilities import *
 
 
-#main = Blueprint('main', __name__)
+bp = Blueprint('main', __name__)
 
 
 MODELS = {
@@ -37,12 +37,12 @@ REFERENCE = {
 
 ############################################ GENERAL ROUTES ###################################################
 
-@app.route('/')
+@bp.route('/')
 def home():    
     return render_template('home.html')
 
 
-@app.route('/load-form', methods=['GET'])
+@bp.route('/load-form', methods=['GET'])
 def load_form():
     # 获取请求参数 mode 的值
     mode = request.args.get('modal-mode')
@@ -56,7 +56,7 @@ def load_form():
         return "Invalid mode", 400
 
 
-@app.route('/<object_class>/<inst_id>', methods=['GET'])
+@bp.route('/<object_class>/<inst_id>', methods=['GET'])
 def get_instance(inst_id:str, object_class:str):
     print(f"Getting {object_class}: {inst_id}...")
     # 根据类名获取类对象
@@ -83,7 +83,7 @@ def get_instance(inst_id:str, object_class:str):
 
 
 # 添加新实例
-@app.route('/<object_class>/add', methods=['POST'])
+@bp.route('/<object_class>/add', methods=['POST'])
 def add_instance(object_class:str):
     print(f"Adding new {object_class}...")
     # 根据类名获取类对象
@@ -121,9 +121,9 @@ def add_instance(object_class:str):
 
 
 # 修改现有实例
-@app.route('/<object_class>/<int:instance_id>/edit', methods=['PUT'])
-def edit_instance(object_class: str, instance_id: int):
-    print(f"Editing {object_class} instance: {instance_id}...")
+@bp.route('/<object_class>/<inst_id>/edit', methods=['PUT'])
+def edit_instance(object_class: str, inst_id: int):
+    print(f"Editing {object_class} instance: {inst_id}...")
     # 根据类名获取类对象
     object_model = MODELS.get(object_class)
     if not object_model:
@@ -136,9 +136,9 @@ def edit_instance(object_class: str, instance_id: int):
             form_data = request.form.to_dict()  # 用于接收传统的表单提交
         print(f"Received form data for '{object_class}': {form_data}")
         # 查询数据库中的实例
-        instance = object_model.query.get(instance_id)
+        instance = object_model.query.get(inst_id)
         if not instance:
-            return jsonify(success=False, message=f"{object_class} instance with ID {instance_id} not found"), 404
+            return jsonify(success=False, message=f"{object_class} instance with ID {inst_id} not found"), 404
         # 更新实例的属性
         for key, value in form_data.items():
             if key in object_model.__table__.columns.keys():
@@ -152,14 +152,14 @@ def edit_instance(object_class: str, instance_id: int):
         return jsonify(success=False, message="Failed to update instance: " + str(e)), 500
 
 
-@app.route('/<object_class>/<inst_id>/update', methods=['POST'])
+@bp.route('/<object_class>/<inst_id>/update', methods=['POST'])
 def update_instance(object_class:str, inst_id:str):
     print(f"Updating {object_class}: {inst_id}")
 
     return jsonify(success=True)
 
 
-@app.route('/<object_class>/<inst_id>/delete', methods=['DELETE'])
+@bp.route('/<object_class>/<inst_id>/delete', methods=['DELETE'])
 def delete_instance(object_class:str, inst_id:str):
     print(f"Deleting {object_class}: {inst_id}")
     # 根据类名获取类对象
@@ -171,7 +171,7 @@ def delete_instance(object_class:str, inst_id:str):
     return jsonify(success=True)
 
 # 打印指定实例的 PDF 报告
-@app.route('/<object_class>/<inst_id>/print', methods=['GET'])
+@bp.route('/<object_class>/<inst_id>/print', methods=['GET'])
 def generate_pdf(inst_id:str, object_class:str):
     # 判断是否给定 id
     if not inst_id:
@@ -184,7 +184,7 @@ def generate_pdf(inst_id:str, object_class:str):
     if not instance:
         return "Issue not found", 404
      # 渲染 HTML 模板，将 issue 实例传递给模板
-    rendered_html = render_template(f'report/{object_class}.html', instance=instance)
+    rendered_html = render_template(f'report/{object_class}.html', inst=instance)
     # 创建 BytesIO 对象，用于保存生成的 PDF 文件
     pdf_file = BytesIO()
     # 使用 WeasyPrint 将 HTML 转换为 PDF
@@ -200,7 +200,7 @@ def generate_pdf(inst_id:str, object_class:str):
 
 ############################################ ISSUE SPECIFIC ROUTES ############################################
 
-@app.route('/issue')
+@bp.route('/issue')
 def issue_page():
     
     theme = 'issue'
@@ -282,7 +282,7 @@ def issue_page():
 
 ############################################ TICKET SPECIFIC ROUTES ###########################################
 
-@app.route('/ticket')
+@bp.route('/ticket')
 def ticket_page():
 
     theme = 'ticket'
@@ -312,7 +312,7 @@ def ticket_page():
                            )
 
 
-@app.route('/ticket/upload', methods=['POST'])
+@bp.route('/ticket/upload', methods=['POST'])
 def upload_ticket():
     # 检查请求中是否包含文件，如果不存在，显示错误信息并重定向回上传页面
     if 'file' not in request.files:
@@ -328,7 +328,7 @@ def upload_ticket():
         # 确保上传的文件名是安全的，并移除任何可能导致安全问题的字符
         filename = secure_filename(file.filename)
         # 构建文件路径
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        filepath = os.path.join(bp.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         # 处理文件，parse_dates 参数定义需要被转化为日期的列
         if filename.endswith('.csv'):
@@ -354,7 +354,7 @@ def upload_ticket():
 
 ########################################## COMMISSION SPECIFIC ROUTES #########################################
 
-@app.route('/commission')
+@bp.route('/commission')
 def commission_page():
 
     theme = 'commission'
@@ -366,7 +366,7 @@ def commission_page():
 
 ############################################ SERVICE SPECIFIC ROUTES ##########################################
 
-@app.route('/service')
+@bp.route('/service')
 def service_page():
 
     theme = 'service'
@@ -378,7 +378,7 @@ def service_page():
 
 ############################################ ABOUT SPECIFIC ROUTES ############################################
 
-@app.route('/about')
+@bp.route('/about')
 def about_page():
 
     theme = 'about'

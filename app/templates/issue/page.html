@@ -87,7 +87,7 @@
 
 {% block control %}
 <!-- 对实例的筛选项 -->
-<form id="issueControl" action="{{ url_for('issue_page') }}" method="GET">
+<form id="issueControl" action="{{ url_for('main.issue_page') }}" method="GET">
     <div class="form-group">
         <label for="issueSelect">Select Issue</label>
         <!-- 路由根据 name 参数获得值 -->
@@ -137,7 +137,7 @@
     </div>
     <!-- 重置按钮：重置筛选，跳转到无参数的 issue 页面 -->
     <div class="form-group">
-        {% set issue_url = url_for('issue_page') %}
+        {% set issue_url = url_for('main.issue_page') %}
         <button type="button" class="btn btn-primary" onclick="resetFilters('{{ issue_url }}')">Reset Filters</button>
     </div>
 </form>

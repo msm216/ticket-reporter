@@ -1,4 +1,4 @@
-<form class="modal-form" method="POST">
+<form class="modal-form" method="POST" id="editForm">
     <div class="form-group">
         <label for="title">Issue Title</label>
         <input type="text" class="form-control" id="title" name="title" value="">
@@ -11,3 +11,16 @@
         <button id="modalSubmit" type="submit" class="btn btn-primary mt-3">Submit</button>
     </div>
 </form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 获取当前选中的ticket ID
+        const ticketId = document.querySelector('#ticketIdInput') ? 
+                         document.querySelector('#ticketIdInput').value : '';
+        
+        if (ticketId) {
+            // 设置表单的action属性
+            document.getElementById('editForm').action = "{{ url_for('main.edit_instance', object_class='ticket', instance_id='') }}" + ticketId;
+        }
+    });
+</script>

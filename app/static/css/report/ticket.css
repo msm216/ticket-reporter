@@ -1,114 +1,23 @@
 body {
     font-family: Arial, sans-serif;
     margin: 20mm;  /* 设置PDF页面的边距，20mm为合适的边距 */
-    color: #333;
-    line-height: 1.4;
 }
-
-.report-header {
-    text-align: center;
-    margin-bottom: 30px;
-    border-bottom: 2px solid #333;
-    padding-bottom: 10px;
+h1 {
+    text-align: center;  /* 标题居中 */
 }
-
-.report-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.report-id {
-    font-size: 18px;
-    color: #666;
-    margin-bottom: 5px;
-}
-
-.section {
-    margin-bottom: 20px;
-    page-break-inside: avoid;  /* 尽量避免在section中间分页 */
-}
-
-.section-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 5px;
-    color: #444;
-}
-
-.info-row {
-    margin-bottom: 8px;
-    display: table;
-    width: 100%;
-}
-
-.info-label {
-    font-weight: bold;
-    width: 150px;
-    display: table-cell;
-    vertical-align: top;
-}
-
-.info-value {
-    display: table-cell;
-}
-
-.description-box {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 4px;
-    margin-top: 5px;
-    white-space: pre-wrap;  /* 保留文本格式 */
-}
-
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
-    page-break-inside: avoid;  /* 避免表格在中间分页 */
+    margin-top: 20px;
 }
-
+table, th, td {
+    border: 1px solid black;
+}
 th, td {
-    border: 1px solid #ddd;
     padding: 8px 12px;
     text-align: left;
 }
-
-th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-}
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.footer {
-    margin-top: 30px;
+.header {
+    margin-bottom: 20px;
     text-align: center;
-    font-size: 12px;
-    color: #666;
-    border-top: 1px solid #ddd;
-    padding-top: 10px;
-}
-
-/* 打印优化 */
-@page {
-    margin: 20mm;  /* 设置页面边距 */
-    @bottom-center {
-        content: "Page " counter(page) " of " counter(pages);  /* 添加页码 */
-    }
-}
-
-/* 确保重要内容不会在页面中间断开 */
-h1, h2, h3, h4, h5, h6 {
-    page-break-after: avoid;
-}
-
-/* 处理长文本的换行 */
-p, div {
-    word-wrap: break-word;
 }

@@ -24,6 +24,7 @@ logging.basicConfig(level=logging.INFO)
 app = create_app()
 
 if __name__ == '__main__':
+    
     print("Starting Flask application...")
     print("Access the application at: http://127.0.0.1:5000/")
     app.run(debug=True, use_reloader=False)  # 禁用重载器可能会减少一些警告

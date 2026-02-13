@@ -12,8 +12,9 @@ logging.getLogger('fontTools').setLevel(logging.ERROR)   # 设置 fontTools 日�
 db = SQLAlchemy()
 
 def create_app(test_config=None):
-    # 创建并配置app
-    app = Flask(__name__, instance_relative_config=True)
+    # 创建并配置app模板路径
+    template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+    app = Flask(__name__, instance_relative_config=True, template_folder=template_dir)
     
     # 设置默认配置
     app.config.from_object(Config)

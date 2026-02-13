@@ -39,7 +39,7 @@ REFERENCE = {
 
 @bp.route('/')
 def home():    
-    return render_template('home.html')
+    return render_template('home/page.html')
 
 
 @bp.route('/load-form', methods=['GET'])
@@ -384,5 +384,5 @@ def about_page():
     theme = 'about'
     print(f"\nTheme of the page: '{theme}'.")
 
-    return render_template('about.html',
+    return render_template('about/page.html',
                            last_update_date=last_commit_time())

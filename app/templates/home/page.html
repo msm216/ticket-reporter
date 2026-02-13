@@ -1,0 +1,47 @@
+{% extends "base/page.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block page_header_text %}Fixed Home Header{% endblock %}
+
+{% block page_subheader_text %}Welcome to the Home page.{% endblock %}
+
+{% block content %}
+<div id="paragraph-container"></div>
+{% endblock %}
+
+{% block control %}
+<button id="add-paragraph-btn" class="btn btn-primary">Add Paragraph</button>
+<form>
+    <div class="form-group">
+        <label for="example-select">Font Family</label>
+        <select class="form-control" id="example-select">
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="'Courier New', monospace">Courier New</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="'Segoe UI', sans-serif">Segoe UI</option>
+            <option value="Verdana, sans-serif">Verdana</option>
+            <option value="Tahoma, sans-serif">Tahoma</option>
+            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="example-range">Example range</label>
+        <div class="range-container">
+            <input type="range" class="form-control-range" id="example-range" min="10" max="50" value="16">
+            <span id="range-value">{{ rangeValue }}</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="example-input">Paragraph Length</label>
+        <input type="number" class="form-control" id="example-input" value="500" min="1" placeholder="Enter number of characters">
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+{% endblock %}

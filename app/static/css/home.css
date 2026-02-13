@@ -13,3 +13,21 @@
     width: 30px; /* Adjust width as necessary */
     text-align: center;
 }
+
+/* Adjust spacing between labels and form controls */
+.form-group label {
+    margin-bottom: 5px;
+    display: block;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="range"],
+.form-group select {
+    margin-top: 2px;
+}
+
+/* Adjust spacing between button and form */
+#add-paragraph-btn {
+    margin-bottom: 7px;
+}

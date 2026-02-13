@@ -38,7 +38,11 @@ def create_app(test_config=None):
     db.init_app(app)
 
     # 注册蓝图
-    from app.views import bp
-    app.register_blueprint(bp)
+    from app.blueprints import home_bp, issue_bp, ticket_bp, pages_bp, api_bp
+    app.register_blueprint(home_bp)
+    app.register_blueprint(issue_bp)
+    app.register_blueprint(ticket_bp)
+    app.register_blueprint(pages_bp)
+    app.register_blueprint(api_bp)
 
     return app

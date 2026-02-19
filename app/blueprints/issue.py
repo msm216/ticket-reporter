@@ -14,11 +14,13 @@ def issue_page():
     theme = 'issue'
     print(f"\nPage theme: {theme}")
 
-    # Get all Issue instances
-    issues_all = Issue.query.all()
-    # Sort resolutions by update_on descending
+    # Get all Issue instances with eager loading of resolutions
+    from sqlalchemy.orm import joinedload
+    issues_all = Issue.query.options(joinedload(Issue.resolutions)).all()
+    # Sort resolutions by update_on descending (only if needed)
     for issue in issues_all:
-        issue.resolutions = sorted(issue.resolutions, key=lambda r: r.update_on, reverse=True)
+        if issue.resolutions:
+            issue.resolutions = sorted(issue.resolutions, key=lambda r: r.update_on, reverse=True)
 
     # Handle instance selection
     selected_issue_id = request.args.get('issue-select', 'all')

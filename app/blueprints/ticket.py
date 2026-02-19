@@ -17,11 +17,13 @@ def ticket_page():
     theme = 'ticket'
     print(f"\nTheme of the page: '{theme}'.")
 
-    # Get all Ticket instances
-    tickets_all = Ticket.query.all()
-    # Sort tasks by execute_on descending
+    # Get all Ticket instances with eager loading of tasks
+    from sqlalchemy.orm import joinedload
+    tickets_all = Ticket.query.options(joinedload(Ticket.tasks)).all()
+    # Sort tasks by execute_on descending (only if needed)
     for ticket in tickets_all:
-        ticket.tasks = sorted(ticket.tasks, key=lambda r: r.execute_on, reverse=True)
+        if ticket.tasks:
+            ticket.tasks = sorted(ticket.tasks, key=lambda r: r.execute_on, reverse=True)
 
     tickets_filtered = tickets_all
 

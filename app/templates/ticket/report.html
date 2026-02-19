@@ -5,7 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ticket Report - {{ inst.id }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/report/ticket.css') }}">
+    <style>
+    {{ css_content }}
+    </style>
 </head>
 <body>
     <h1>Ticket Report - {{ inst.title }}</h1>

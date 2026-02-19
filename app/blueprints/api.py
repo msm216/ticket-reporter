@@ -4,7 +4,7 @@ import enum
 from datetime import datetime
 from flask import Blueprint, request, jsonify, send_file
 from io import BytesIO
-from weasyprint import HTML
+import pdfkit
 
 from app.models import Issue, Resolution, Ticket, Task
 from app import db
@@ -146,26 +146,61 @@ def delete_instance(object_class: str, inst_id: str):
 
 @bp.route('/<object_class>/<inst_id>/print', methods=['GET'])
 def generate_pdf(inst_id: str, object_class: str):
-    """Generate PDF report for instance"""
+    """Generate PDF report for instance using pdfkit"""
+    from flask import request, url_for
+
     if not inst_id:
         return "No issue selected", 400
 
     object_model = MODELS.get(object_class)
-    instance = object_model.query.get(inst_id)
+
+    # Use eager loading to avoid N+1 query problem
+    from sqlalchemy.orm import joinedload
+    if object_class == 'issue':
+        instance = object_model.query.options(joinedload(object_model.resolutions)).get(inst_id)
+    elif object_class == 'ticket':
+        instance = object_model.query.options(joinedload(object_model.tasks)).get(inst_id)
+    else:
+        instance = object_model.query.get(inst_id)
 
     if not instance:
         return "Issue not found", 404
 
-    # Render HTML template
+    # Read CSS file content and inline it
+    import os
+    css_path = os.path.join(os.path.dirname(__file__), '..', 'static', 'css', 'report', f'{object_class}.css')
+    with open(css_path, 'r', encoding='utf-8') as f:
+        css_content = f.read()
+
+    # Render HTML template with inline CSS
     from flask import render_template
-    rendered_html = render_template(f'report/{object_class}.html', inst=instance)
+    rendered_html = render_template(f'{object_class}/report.html', inst=instance, css_content=css_content)
 
-    # Convert HTML to PDF
-    pdf_file = BytesIO()
-    HTML(string=rendered_html).write_pdf(pdf_file)
-    pdf_file.seek(0)
+    # Configure pdfkit options for better performance
+    config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+    options = {
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'margin-top': '10mm',
+        'margin-right': '10mm',
+        'margin-bottom': '10mm',
+        'margin-left': '10mm',
+        'enable-local-file-access': None,
+        'disable-smart-shrinking': '',  # 避免智能缩放，加快渲染
+        'no-stop-slow-scripts': '',  # 不停止慢速脚本
+        'javascript-delay': '100',  # JavaScript执行延迟
+    }
 
-    return send_file(pdf_file,
-                     download_name=f'{instance.id}.pdf',
-                     as_attachment=False,
-                     mimetype='application/pdf')
+    try:
+        # Convert HTML to PDF
+        pdf_bytes = pdfkit.from_string(rendered_html, False, options=options, configuration=config)
+        pdf_file = BytesIO(pdf_bytes)
+        pdf_file.seek(0)
+
+        return send_file(pdf_file,
+                         download_name=f'{instance.id}.pdf',
+                         as_attachment=False,
+                         mimetype='application/pdf')
+    except Exception as e:
+        print(f"Error generating PDF: {str(e)}")
+        return f"Error generating PDF: {str(e)}", 500
